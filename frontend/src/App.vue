@@ -1,50 +1,36 @@
 <template>
   <div>
-    <div>
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur sint
-      libero commodi? Quo, ipsam facilis. Molestias eligendi porro tenetur, rem
-      asperiores non omnis provident? Debitis ipsa blanditiis quidem commodi
-      reprehenderit?
-    </div>
-    <div>
-      <pie-chart
-        :chart-data="{
-          labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
-          datasets: [
-            {
-              backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16'],
-              data: [40, 20, 80, 10],
-            },
-          ],
-        }"
-      />
-    </div>
+    <header-component></header-component>
+    <router-view></router-view>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { Pie as PieChart } from "vue-chartjs";
-
+  import HeaderComponent from "./components/header/header-component.vue";
   import {
-    Chart as ChartJS,
-    Title,
-    Tooltip,
-    Legend,
+    Chart,
     BarElement,
+    LineElement,
+    ArcElement,
+    Title,
+    Legend,
+    Tooltip,
     CategoryScale,
     LinearScale,
-    ArcElement,
+    PointElement,
   } from "chart.js";
 
-  ChartJS.register(
+  Chart.register(
     ArcElement,
     Title,
-    Tooltip,
     Legend,
-    BarElement,
+    Tooltip,
     CategoryScale,
-    LinearScale
+    BarElement,
+    LineElement,
+    LinearScale,
+    PointElement
   );
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped></style>
