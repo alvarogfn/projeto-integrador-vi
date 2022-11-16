@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientModel } from "../models/Clients";
 import { Pie } from "../utils/Chart";
+import { Statistics } from "../utils/Statistics";
 import {
   countObjArrayByProperty,
   groupObjArrayByProperty,
@@ -11,34 +12,25 @@ export function getChartsData(req: Request, res: Response, next: NextFunction) {
     const clients = await ClientModel.find().select({ credit: 1, address: 1 });
     const response: any[] = [];
 
-    const regionPie = new Pie()
-      .withTitle("Crédito por Região")
-      .withSize({ height: 300, width: 300 });
+    const data = countObjArrayByProperty(
+      groupObjArrayByProperty(clients, "address.region"),
+      "credit"
+    );
 
-    const statePie = new Pie()
-      .withTitle("Crédito por Estado")
-      .withSize({ height: 300, width: 300 });
+    const pie = new Pie(Object.keys(data))
+      .withTitle("Crédito Buscado Por Região do Brasil")
+      .withSource("COOPAGE")
+      .withInsight(
+        "Região com maior busca de crédito",
+        Statistics.biggest(data).label
+      )
+      .withInsight(
+        "Região com menor busca de crédito",
+        Statistics.lowest(data).label
+      )
+      .withValues("Gráfico", Object.values(data));
 
-    const cityPie = new Pie()
-      .withTitle("Crédito por Cidade")
-      .withSize({ height: 300, width: 300 });
-
-    const groupByRegion = groupObjArrayByProperty(clients, "address.region");
-    const creditByRegion = countObjArrayByProperty(groupByRegion, "credit");
-
-    const groupByState = groupObjArrayByProperty(clients, "address.state");
-    const creditByState = countObjArrayByProperty(groupByState, "credit");
-
-    const groupByCity = groupObjArrayByProperty(clients, "address.city");
-    const creditByCity = countObjArrayByProperty(groupByCity, "credit");
-
-    regionPie.appendMany(creditByRegion);
-    statePie.appendMany(creditByState);
-    cityPie.appendMany(creditByCity);
-
-    response.push(regionPie.toString());
-    response.push(statePie.toString());
-    response.push(cityPie.toString());
+    response.push(pie.toObject());
 
     res.status(200).send(response);
   })();
