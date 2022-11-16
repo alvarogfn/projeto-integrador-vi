@@ -1,36 +1,15 @@
+@use "normalize.scss" as *;
+
 :root {
   font-size: 16px;
 }
 
 * {
-  padding: 0;
   margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  font-family: "Jost", sans-serif;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-
-  cursor: pointer;
-}
-
-ul,
-li,
-ol {
-  list-style: none;
-  display: flex;
-  flex-flow: column;
-}
-
-button {
-  border: none;
-  background-color: inherit;
-  font-family: inherit;
-  font-size: inherit;
-  outline: inherit;
+  font-family: "Roboto";
 }

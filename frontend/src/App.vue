@@ -1,36 +1,14 @@
 <template>
   <div>
-    <header-component></header-component>
-    <router-view></router-view>
+    <header-component />
+    <router-view> </router-view>
   </div>
 </template>
 
-<script setup lang="ts">
-  import HeaderComponent from "./components/header/header-component.vue";
-  import {
-    Chart,
-    BarElement,
-    LineElement,
-    ArcElement,
-    Title,
-    Legend,
-    Tooltip,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-  } from "chart.js";
+<script>
+import HeaderComponent from "./components/header/header-component.vue";
 
-  Chart.register(
-    ArcElement,
-    Title,
-    Legend,
-    Tooltip,
-    CategoryScale,
-    BarElement,
-    LineElement,
-    LinearScale,
-    PointElement
-  );
+export default { components: { HeaderComponent } };
 </script>
 
 <style lang="scss" scoped></style>

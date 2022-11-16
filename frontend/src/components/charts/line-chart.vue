@@ -1,51 +1,26 @@
 <template>
-  <section class="chart">
-    <h1 class="chart__title">{{ props.title }}</h1>
-    <line-chart class="chart__graph" v-bind="props.chart" />
-    <p class="chart__source">Fonte: {{ props.fonts }}</p>
-  </section>
+  <line-chart-js :chart-options="chartOptions" :chart-data="chartData" />
 </template>
 
-<script setup lang="ts">
-  import type {
-    ChartData as ChartDataProp,
-    ChartOptions as ChartOptionsProp,
+<script>
+  import { Line as LineChartJs } from "vue-chartjs";
+  import {
+    Chart as ChartJS,
+    Title,
+    Tooltip,
+    Legend,
+    PointElement,
+    LineElement,
   } from "chart.js";
-  import { Line as LineChart } from "vue-chartjs";
 
-  interface Props {
-    title: string;
-    fonts: string;
-    chart: {
-      chartData: ChartDataProp<"line">;
-      chartOptions: ChartOptionsProp;
-    };
-  }
+  ChartJS.register(Title, Tooltip, Legend, PointElement, LineElement);
 
-  const props = defineProps<Props>();
+  export default {
+    name: "LineChart",
+    components: { LineChartJs },
+    props: {
+      chartData: Object,
+      chartOptions: Object,
+    },
+  };
 </script>
-
-<style lang="scss" scoped>
-  .chart {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-
-    max-width: 100%;
-    max-height: 100%;
-
-    &__title {
-      margin-bottom: 20px;
-    }
-
-    &__graph {
-      max-width: 100%;
-      max-height: 100%;
-    }
-
-    &__source {
-      font-size: 0.8rem;
-    }
-  }
-</style>
