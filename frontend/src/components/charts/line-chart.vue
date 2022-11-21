@@ -21,6 +21,7 @@
     props: {
       chartData: Object,
       chartOptions: Object,
+      plugins: Object,
     },
   };
 </script>

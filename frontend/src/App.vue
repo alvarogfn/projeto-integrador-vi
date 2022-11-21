@@ -6,9 +6,8 @@
 </template>
 
 <script>
-import HeaderComponent from "./components/header/header-component.vue";
-
-export default { components: { HeaderComponent } };
+  import HeaderComponent from "./components/header/header-component.vue";
+  export default { components: { HeaderComponent } };
 </script>
 
 <style lang="scss" scoped></style>

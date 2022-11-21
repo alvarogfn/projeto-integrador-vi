@@ -2,6 +2,13 @@ import fakerBr from "faker-br";
 import { faker } from "@faker-js/faker";
 import { ClientModel } from "../models/Clients";
 
+const regioes = ["Norte", "Nordeste", "Centro-oeste", "Suldeste", "Sul"];
+const cidades = ["Unai", "Paracatu", "Vazante", "Buritis", "Arinos"];
+
+function random<T>(arr: T[]) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 export async function FakePopulate() {
   faker.setLocale("pt_BR");
 
@@ -10,8 +17,8 @@ export async function FakePopulate() {
     cpf: fakerBr.br.cpf(),
     address: {
       state: faker.address.state(),
-      city: faker.address.city(),
-      region: faker.address.direction(),
+      city: random(cidades),
+      region: random(regioes),
     },
     birthdate: faker.date.birthdate(),
     credit: faker.finance.amount(),

@@ -4,7 +4,7 @@ import clientController from "./controllers/clientController";
 
 const route = express.Router();
 
-route.get("/analytics", analyticsController.getChartsData);
+route.get("/analytics", analyticsController.appData);
 route.get("/clients", clientController.getClients);
 
 export default route;

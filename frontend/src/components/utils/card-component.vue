@@ -1,16 +1,15 @@
 <template>
-  <div :style="{ borderLeftColor: getRandomColor() }">
+  <div :style="{ borderLeftColor: color }">
     <slot></slot>
   </div>
 </template>
 
 <script>
   export default {
-    methods: {
-      getRandomColor() {
-        return "hsla(" + Math.random() * 360 + ", 100%, 50%, 1)";
-      },
+    props: {
+      color: String,
     },
+    methods: {},
   };
 </script>
 

@@ -1,28 +1,24 @@
-import { colors } from "./Utils";
-
 class Dataset {
-  private label: string;
-  private color: string | string[];
+  private _label: string = "";
+  private _colors: string[] = [];
   private _values: number[] = [];
 
-  constructor(label: string, color: string | string[]) {
-    this.label = label;
-    this.color = color;
+  constructor(label: string) {
+    this._label = label;
   }
 
-  get values() {
-    return this._values.sort((a, b) => a - b).reverse();
-  }
+  withValues(field: { color: string; value: number }) {
+    this._values.push(field.value);
+    this._colors.push(field.color);
 
-  set values(values: number[]) {
-    this._values = values;
+    return this;
   }
 
   toObject() {
     return {
-      data: this.values,
-      label: this.label,
-      backgroundColor: this.color,
+      data: this._values.sort((a, b) => a - b).reverse(),
+      label: this._label,
+      backgroundColor: this._colors,
     };
   }
 }
@@ -37,13 +33,9 @@ export abstract class Chart {
   protected width: number = 300;
 
   protected _datasets: Dataset[] = [];
-  protected labels: string[] = [];
+  protected labels: Set<string> = new Set();
 
   protected insights: { title: string; content: string }[] = [];
-
-  constructor(labels: string[] = []) {
-    this.labels = labels;
-  }
 
   withTitle(title: string) {
     this.title = title;
@@ -55,13 +47,15 @@ export abstract class Chart {
     return this;
   }
 
-  withValues(label: string, values: number[]) {
-    const dataset = new Dataset(label, colors[this._datasets.length]);
-    dataset.values = values;
-
-    this._datasets.push(dataset);
-
+  withLabels(labels: string[]) {
+    labels.forEach((label) => this.labels.add(label));
     return this;
+  }
+
+  newDataset(label: string) {
+    const dataset = new Dataset(label);
+    this._datasets.push(dataset);
+    return dataset;
   }
 
   withInsight(title: string, content: string) {
@@ -73,7 +67,7 @@ export abstract class Chart {
     return {
       type: this.type,
       chartData: {
-        labels: this.labels,
+        labels: Array.from(this.labels).sort(),
         datasets: this._datasets.map((dataset) => dataset.toObject()),
       },
       insights: this.insights,
@@ -85,14 +79,6 @@ export abstract class Chart {
 
 export class Pie extends Chart {
   protected type: string = "pie";
-
-  withValues(label: string, values: number[]) {
-    const dataset = new Dataset(label, colors);
-    dataset.values = values;
-    this._datasets.push(dataset);
-
-    return this;
-  }
 }
 
 export class Bar extends Chart {

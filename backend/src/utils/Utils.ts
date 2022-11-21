@@ -50,7 +50,10 @@ export function accessNestedProperty<T>(object: T, keys: string) {
   return accessNestedProperty(object[key], arrKeys.join("."));
 }
 
-export function groupObjArrayByProperty<T>(data: T[], properties: string) {
+export function groupObjArrayByProperty<T, K extends string>(
+  data: T[],
+  properties: K
+): { [k: string]: T[] } {
   return data.reduce((group, obj) => {
     const property = accessNestedProperty(obj, properties);
     if (group[property] === undefined) {

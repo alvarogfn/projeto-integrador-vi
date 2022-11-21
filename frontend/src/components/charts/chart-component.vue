@@ -1,13 +1,16 @@
 <template>
   <card-component class="chart">
-    <h1 class="chart__title">{{ title }}</h1>
     <component
       class="chart__canvas"
       :is="chartComponent"
       :chart-data="chartData"
-      :chart-options="chartOptions"
+      :chart-options="{
+        ...chartOptions,
+        responsive: true,
+        maintainAspectRatio: false,
+      }"
+      :plugins="plugins"
     />
-    <p class="chart__source">{{ source }}</p>
   </card-component>
 </template>
 
@@ -16,6 +19,8 @@
   import BarChart from "./bar-chart.vue";
   import LineChart from "./line-chart.vue";
   import PieChart from "./pie-chart.vue";
+  import RadarChart from "./radar-chart.vue";
+  import DoughnutChart from "./doughnut-chart.vue";
 
   export default {
     props: {
@@ -26,9 +31,9 @@
           return ["pie", "bar", "line"].includes(value);
         },
       },
-      title: String,
-      source: String,
       chartData: Object,
+      plugins: Object,
+      chartId: Number,
       chartOptions: {
         type: Object,
         default: () => ({
@@ -36,8 +41,6 @@
           maintainAspectRatio: false,
         }),
       },
-      height: { type: Number, default: 300 },
-      width: { type: Number, default: 300 },
     },
     computed: {
       chartComponent() {
@@ -45,6 +48,10 @@
           return PieChart;
         } else if (this.type === "bar") {
           return BarChart;
+        } else if (this.type === "radar") {
+          return RadarChart;
+        } else if (this.type === "doughnut") {
+          return DoughnutChart;
         } else {
           return LineChart;
         }
@@ -56,13 +63,8 @@
 
 <style lang="scss" scoped>
   .chart {
-    width: v-bind(width);
-    height: v-bind(height);
-
     display: flex;
     flex-flow: column nowrap;
-
-    overflow: hidden;
 
     padding: 10px;
 
@@ -76,7 +78,7 @@
       display: flex;
       align-items: center;
       margin: 0;
-      padding: 10px;
+      padding: 0 10px 10px;
       font-size: 1rem;
 
       color: #222;
@@ -88,7 +90,6 @@
 
     &__canvas {
       height: 100%;
-
       width: 100%;
     }
   }
