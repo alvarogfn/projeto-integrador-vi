@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import moment from "moment";
 
-interface ClientInterface {
+export interface ClientInterface {
   name: string;
   cpf: string;
   birthdate: Date;

@@ -1,77 +1,13 @@
-import { group } from "console";
 import { NextFunction, Request, Response } from "express";
-import { ClientModel } from "../models/Clients";
+import { ClientInterface, ClientModel } from "../models/Clients";
 import { Bar, Line, Pie } from "../utils/Chart";
-import { Statistics } from "../utils/Statistics";
-import {
-  colors,
-  countObjArrayByProperty,
-  groupObjArrayByProperty,
-} from "../utils/Utils";
+import { colors, groupObjArrayByProperty } from "../utils/Utils";
 
 export async function appData(req: Request, res: Response, next: NextFunction) {
+  const data = await ClientModel.find();
   return res.send([
-    {
-      type: "pie",
-      chartData: {
-        labels: ["Suldeste", "Sul", "Nordeste", "Centro-oeste", "Norte"],
-        datasets: [
-          {
-            data: [10, 9, 8, 7, 6],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-        ],
-      },
-      chartOptions: {
-        plugins: {
-          title: {
-            display: true,
-            text: "Qual o consumo de crédito por região Brasileira?",
-            color: "black",
-            align: "start",
-          },
-        },
-      },
-    },
-    {
-      type: "line",
-      chartData: {
-        labels: ["Jovens", "Adultos", "Idosos"],
-        datasets: [
-          {
-            label: "Quantidade de crédito",
-            data: [20, 35, 30],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-        ],
-      },
-      chartOptions: {
-        plugins: {
-          title: {
-            display: true,
-            text: "Qual o consumo de crédito médio por idade no Brasil?",
-            color: "black",
-            align: "start",
-          },
-        },
-      },
-    },
+    chartMedianByAge(data),
+    chartLineByAge(data),
     {
       type: "bar",
       chartData: {
@@ -129,36 +65,7 @@ export async function appData(req: Request, res: Response, next: NextFunction) {
         },
       },
     },
-    {
-      type: "bar",
-      chartData: {
-        labels: ["Burits", "Unaí", "Paracatu", "Arinos", "Vazante"],
-        datasets: [
-          {
-            data: [5, 8, 9, 7, 3],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-        ],
-      },
-      chartOptions: {
-        plugins: {
-          title: {
-            display: true,
-            text: "Qual o consumo de crédito médio por cidade no Noroeste Mineiro?",
-            color: "black",
-            align: "start",
-          },
-        },
-      },
-    },
+    chartMedianByCity(data),
     {
       type: "line",
       chartData: {
@@ -411,160 +318,124 @@ export async function appData(req: Request, res: Response, next: NextFunction) {
   ]);
 }
 
-// async function getAgeData() {
-//   const clients = await ClientModel.find();
+export async function insights(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {}
 
-//   const groupByRegion = groupObjArrayByProperty(clients, "address.region");
+function chartMedianByAge(clients: ClientInterface[]) {
+  const map = new Map();
 
-//   const groupByRegionAndByAge = Object.keys(groupByRegion).reduce(
-//     (acc, key) => {
-//       acc[key] = groupByRegion[key].reduce((acc, client, _, arr) => {
-//         if (acc[client.age] === undefined) {
-//           acc[client.age] = +client.credit.toFixed(2);
-//           return acc;
-//         }
-//         acc[client.age] += +client.credit.toFixed(2);
+  map.set("Jovens", []);
+  map.set("Adultos", []);
+  map.set("Idosos", []);
 
-//         return acc;
-//       }, {} as { [key: string]: number });
+  clients.forEach((client) => {
+    if (client.age >= 18 && client.age <= 39) {
+      map.get("Jovens").push(client);
+    } else if (client.age >= 40 && client.age <= 59) {
+      map.get("Adultos").push(client);
+    } else {
+      map.get("Idosos").push(client);
+    }
+  });
 
-//       return acc;
-//     },
-//     {} as { [k: string]: {} }
-//   );
+  const result: { [k: string]: number } = {};
 
-//   const data = Object.keys(groupByRegion).reduce((acc, key) => {
-//     return (acc[key] = groupObjArrayByProperty(groupByRegion[key], "age"));
-//   }, {});
+  map.forEach((value, key) => {
+    result[key] = +(
+      value.reduce((acc: number, client: ClientInterface) => {
+        return acc + client.credit;
+      }, 0) / value.length
+    ).toFixed(2);
+  });
 
-//   console.log(data);
+  const pie = new Pie()
+    .withLabels(Object.keys(result))
+    .withTitle("Quanto de crédito é buscado em média por idade? ");
 
-//   // const data = Object.keys(groupByRegion).map((key) => {
-//   //   return {
-//   //     [key]: Object.entries(
-//   //       groupObjArrayByProperty(groupByRegion[key], "age")
-//   //     ).map(([key, values]) => {
-//   //       const average = Statistics.average(values.map((value) => value.credit));
-//   //       return { [key]: average };
-//   //     }),
-//   //   };
-//   // });
+  const dataset = pie.newDataset("Crédito por Faixa Etária");
 
-//   console.log(data);
+  Object.values(result).forEach((value, index) => {
+    dataset.withValues({ value, color: colors[index * 2] });
+  });
 
-//   const line = new Line().withLabels(
-//     Object.keys(groupByRegionAndByAge)
-//       .map((key) => Object.keys(groupByRegionAndByAge[key]).map((key) => key))
-//       .flat()
-//   );
+  return pie.toObject();
+}
 
-//   for (const key in groupByRegionAndByAge) {
-//     const groupByAge = groupByRegionAndByAge[key];
-//     const dataset = line.newDataset(key);
-//     for (const [key, value] of Object.entries(groupByAge)) {
-//       dataset.withValues({ value: groupByAge[key], color[0] });
-//     }
-//   }
+function chartLineByAge(clients: ClientInterface[]) {
+  const map = new Map();
 
-//   console.log(line.toObject());
+  map.set(20, []);
+  map.set(30, []);
+  map.set(40, []);
+  map.set(50, []);
+  map.set(60, []);
+  map.set(70, []);
 
-//   line.newDataset();
+  clients.forEach((client) => {
+    if (client.age < 30) {
+      map.get(20).push(client);
+    } else if (client.age < 40) {
+      map.get(30).push(client);
+    } else if (client.age < 50) {
+      map.get(40).push(client);
+    } else if (client.age < 60) {
+      map.get(50).push(client);
+    } else if (client.age < 70) {
+      map.get(60).push(client);
+    } else if (client.age <= 80) {
+      map.get(70).push(client);
+    }
+  });
 
-//   Object.entries(groupByRegionAndByAge).forEach((item) => {
-//     console.log(item);
-//   });
+  const line = new Line()
+    .withTitle(
+      "O qual a tendência de consumo de crédito ao longo das faixas etárias?"
+    )
+    .withAxis({ x: "Idade", y: "Média de Crédito em Reais" });
 
-//   Object.values(groupByAge).map((value) => {
-//     console.log(value);
-//     return countObjArrayByProperty({}, "age");
-//   });
+  line.withLabels(Array.from(map.keys()));
 
-//   const countByAge = Object.entries(groupByAge).map(([key, array]) => {
-//     return { [key]: array.reduce((acc, act) => acc + act.credit, 0) };
-//   });
+  const dataset = line.newDataset("Credit By Age");
 
-//   const map = new Map();
+  map.forEach((value: ClientInterface[], key) => {
+    dataset.withValues({
+      value: +(
+        value.reduce((acc, client) => acc + client.credit, 0) / value.length
+      ).toFixed(2),
+      color: colors[7],
+    });
+  });
 
-//   countByAge.forEach((object) => {
-//     const [key, value] = Object.entries(object)[0];
-//     map.set(key, +value.toFixed(2));
-//   });
+  return line.toObject();
+}
 
-//   const data = Object.fromEntries(map.entries());
+function chartMedianByCity(clients: ClientInterface[]) {
+  const group = groupObjArrayByProperty(clients, "address.city");
 
-//   const biggest = Statistics.biggest(data);
-//   const lowest = Statistics.lowest(data);
+  const cities = Object.keys(group);
 
-//   const line = new Line().withLabels(Object.keys(data));
+  const bar = new Bar()
+    .withLabels(cities)
+    .withTitle(
+      "Qual o consumo médio de crédito nas cidades do noroeste mineiro"
+    )
+    .withAxis({ y: "Montante de Crédito", x: "Cidade" });
+  const dataset = bar.newDataset("Cidades");
 
-//   const line = new Line(Object.keys(data))
-//     .withTitle("Qual idade mais busca por crédito hoje?")
-//     .withValues("", Object.values(data))
-//     .withInsight("Qual idade mais busca por crédito?", biggest.label + " anos")
-//     .withInsight("Qual idade menos busca por crédito?", lowest.label + " anos");
+  Object.keys(group).forEach((key, index) => {
+    const value = +(
+      group[key].reduce((acc, client) => acc + client.credit, 0) /
+      group[key].length
+    ).toFixed(2);
 
-//   return line.toObject();
-// }
+    dataset.withValues({ value, color: colors[index] });
+  });
 
-// async function getRegionData() {
-//   const clients = await ClientModel.find();
-
-//   const groupByAge = groupObjArrayByProperty(clients, "address.region");
-
-//   const countByAge = Object.entries(groupByAge).map(([key, array]) => {
-//     return { [key]: array.reduce((acc, act) => acc + act.credit, 0) };
-//   });
-
-//   const map = new Map();
-
-//   countByAge.forEach((object) => {
-//     const [key, value] = Object.entries(object)[0];
-//     map.set(key, +value.toFixed(2));
-//   });
-
-//   const data = Object.fromEntries(map.entries());
-
-//   const biggest = Statistics.biggest(data);
-//   const lowest = Statistics.lowest(data);
-
-//   const pie = new Pie(Object.keys(data))
-//     .withTitle("Qual idade mais busca por crédito hoje?")
-//     .withValues("", Object.values(data))
-//     .withInsight("Qual idade mais busca por crédito?", biggest.label + " anos")
-//     .withInsight("Qual idade menos busca por crédito?", lowest.label + " anos");
-
-//   return pie.toObject();
-// }
-
-// async function getAgeRegion() {
-//   const clients = await ClientModel.find();
-
-//   const groupByAge = groupObjArrayByProperty(clients, "address.region");
-
-//   const countByAge = Object.entries(groupByAge).map(([key, array]) => {
-//     return { [key]: array.reduce((acc, act) => acc + act.credit, 0) };
-//   });
-
-//   const map = new Map();
-
-//   countByAge.forEach((object) => {
-//     const [key, value] = Object.entries(object)[0];
-//     map.set(key, +value.toFixed(2));
-//   });
-
-//   const data = Object.fromEntries(map.entries());
-
-//   const biggest = Statistics.biggest(data);
-//   const lowest = Statistics.lowest(data);
-
-//   const pie = new Pie(Object.keys(data))
-//     .withTitle("Qual idade mais busca por crédito hoje?")
-//     .withValues("", Object.values(data))
-//     .withInsight("Qual idade mais busca por crédito?", biggest.label + " anos")
-//     .withInsight("Qual idade menos busca por crédito?", lowest.label + " anos");
-
-//   return pie.toObject();
-// }
+  return bar.toObject();
+}
 
 export default {
   appData,

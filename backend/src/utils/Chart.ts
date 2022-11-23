@@ -29,6 +29,8 @@ export abstract class Chart {
   protected title: string = "";
   protected source: string = "";
 
+  protected axis: { x: string; y: string } = { x: "", y: "" };
+
   protected height: number = 300;
   protected width: number = 300;
 
@@ -36,6 +38,12 @@ export abstract class Chart {
   protected labels: Set<string> = new Set();
 
   protected insights: { title: string; content: string }[] = [];
+
+  withAxis(axis: { x: string; y: string }) {
+    this.axis = axis;
+
+    return this;
+  }
 
   withTitle(title: string) {
     this.title = title;
@@ -64,16 +72,49 @@ export abstract class Chart {
   }
 
   toObject() {
-    return {
+    const object = {
       type: this.type,
       chartData: {
         labels: Array.from(this.labels).sort(),
         datasets: this._datasets.map((dataset) => dataset.toObject()),
       },
+      chartOptions: {
+        scales: {},
+        plugins: {
+          title: {
+            display: true,
+            text: this.title,
+            color: "black",
+            align: "start",
+          },
+        },
+      },
       insights: this.insights,
-      title: this.title,
       source: this.source,
     };
+
+    if (this.axis.y)
+      object.chartOptions.scales = {
+        y: {
+          title: {
+            display: true,
+            text: this.axis.y,
+          },
+        },
+      };
+
+    if (this.axis.x) {
+      object.chartOptions.scales = {
+        x: {
+          title: {
+            display: true,
+            text: this.axis.x,
+          },
+        },
+      };
+    }
+
+    return object;
   }
 }
 

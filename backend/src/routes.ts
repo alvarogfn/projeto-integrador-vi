@@ -6,5 +6,6 @@ const route = express.Router();
 
 route.get("/analytics", analyticsController.appData);
 route.get("/clients", clientController.getClients);
+// route.get("/insights", insightsController)
 
 export default route;

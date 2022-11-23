@@ -53,8 +53,8 @@
     }
 
     &__app {
-      display: flex;
-      flex-flow: row wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
       gap: 20px;
 
       * {
