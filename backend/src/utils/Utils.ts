@@ -1,3 +1,5 @@
+import { ClientInterface } from "../models/Clients";
+
 export const colors = [
   "hsla(251, 100%, 10%, 1)",
   "hsla(251, 100%, 20%, 1)",
@@ -34,6 +36,17 @@ export const colors = [
   "#04D939",
   "#F2E205",
   "#F2B705",
+  "#F28705",
+  "#F20505",
+];
+
+export const rainbowColors = [
+  "#F20530",
+  "#260101",
+  "#012340",
+  "#023535",
+  "#025939",
+  "#04D939",
   "#F28705",
   "#F20505",
 ];
@@ -78,4 +91,32 @@ export function countObjArrayByProperty<T>(
   });
 
   return obj;
+}
+
+export function groupByAge(clients: ClientInterface[]) {
+  const map = new Map<"Jovens" | "Adultos" | "Idosos", ClientInterface[]>();
+
+  map.set("Jovens", []);
+  map.set("Adultos", []);
+  map.set("Idosos", []);
+
+  clients.forEach((client) => {
+    if (client.age >= 18 && client.age <= 39) {
+      map.get("Jovens")?.push(client);
+    } else if (client.age >= 40 && client.age <= 59) {
+      map.get("Adultos")?.push(client);
+    } else {
+      map.get("Idosos")?.push(client);
+    }
+  });
+
+  return map;
+}
+
+export function absToPercent(object: { [key: string]: number }) {
+  const total = Object.entries(object).reduce((acc, [_, value]) => {
+    return acc + value;
+  }, 0);
+
+  console.log(total);
 }

@@ -1,9 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientInterface, ClientModel } from "../models/Clients";
 import { Bar, Line, Pie } from "../utils/Chart";
-import { colors, groupObjArrayByProperty } from "../utils/Utils";
+import { Statistics } from "../utils/Statistics";
+import {
+  absToPercent,
+  colors,
+  groupByAge,
+  groupObjArrayByProperty,
+} from "../utils/Utils";
 
-export async function appData(req: Request, res: Response, next: NextFunction) {
+export async function charts(req: Request, res: Response, next: NextFunction) {
   const data = await ClientModel.find();
   return res.send([
     chartMedianByAge(data),
@@ -322,7 +328,150 @@ export async function insights(
   req: Request,
   res: Response,
   next: NextFunction
-) {}
+) {
+  const clients = await ClientModel.find();
+
+  res
+    .status(200)
+    .send([
+      biggestAge(clients),
+      lowestAge(clients),
+      biggestRegion(clients),
+      lowestRegion(clients),
+      biggestCity(clients),
+      lowestCity(clients),
+    ]);
+}
+
+function lowestCity(clients: ClientInterface[]) {
+  const group = groupObjArrayByProperty(clients, "address.city");
+  const map = new Map(Object.entries(group));
+
+  const result = {
+    title: "",
+    value: "",
+  };
+
+  const data = {};
+
+  map.forEach((value, key, arr) => {
+    data[key] =
+      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
+  });
+
+  result.title = "Qual a cidade que menos busca crédito?";
+  result.value = Statistics.lowest(data).label;
+
+  return result;
+}
+
+function biggestCity(clients: ClientInterface[]) {
+  const group = groupObjArrayByProperty(clients, "address.city");
+  const map = new Map(Object.entries(group));
+
+  const result = {
+    title: "",
+    value: "",
+  };
+
+  const data = {};
+
+  map.forEach((value, key, arr) => {
+    data[key] =
+      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
+  });
+
+  result.title = "Qual a cidade que mais busca crédito?";
+  result.value = Statistics.biggest(data).label;
+
+  return result;
+}
+
+function biggestAge(clients: ClientInterface[]) {
+  const group = groupByAge(clients);
+
+  const result = {
+    title: "",
+    value: "",
+  };
+
+  const data = {};
+
+  group.forEach((value, key, arr) => {
+    data[key] =
+      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
+  });
+
+  result.title = "Qual a faixa etária que mais busca crédito?";
+  result.value = Statistics.biggest(data).label;
+
+  return result;
+}
+
+function lowestAge(clients: ClientInterface[]) {
+  const group = groupByAge(clients);
+
+  const result = {
+    title: "",
+    value: "",
+  };
+
+  const data = {};
+
+  group.forEach((value, key, arr) => {
+    data[key] =
+      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
+  });
+
+  result.title = "Qual faixa etária que menos busca crédito?";
+  result.value = Statistics.lowest(data).label;
+
+  return result;
+}
+
+function biggestRegion(clients: ClientInterface[]) {
+  const group = groupObjArrayByProperty(clients, "address.region");
+  const map = new Map(Object.entries(group));
+
+  const result = {
+    title: "",
+    value: "",
+  };
+
+  const data = {};
+
+  map.forEach((value, key, arr) => {
+    data[key] =
+      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
+  });
+
+  result.title = "Qual a região que mais busca crédito?";
+  result.value = Statistics.biggest(data).label;
+
+  return result;
+}
+
+function lowestRegion(clients: ClientInterface[]) {
+  const group = groupObjArrayByProperty(clients, "address.region");
+  const map = new Map(Object.entries(group));
+
+  const result = {
+    title: "",
+    value: "",
+  };
+
+  const data = {};
+
+  map.forEach((value, key, arr) => {
+    data[key] =
+      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
+  });
+
+  result.title = "Qual a região que menos busca crédito?";
+  result.value = Statistics.lowest(data).label;
+
+  return result;
+}
 
 function chartMedianByAge(clients: ClientInterface[]) {
   const map = new Map();
@@ -438,5 +587,6 @@ function chartMedianByCity(clients: ClientInterface[]) {
 }
 
 export default {
-  appData,
+  charts,
+  insights,
 };
