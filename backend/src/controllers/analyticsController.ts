@@ -2,12 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { ClientInterface, ClientModel } from "../models/Clients";
 import { Bar, Line, Pie } from "../utils/Chart";
 import { Statistics } from "../utils/Statistics";
-import {
-  absToPercent,
-  colors,
-  groupByAge,
-  groupObjArrayByProperty,
-} from "../utils/Utils";
+import { colors, groupByAge, groupObjArrayByProperty } from "../utils/Utils";
 
 export async function charts(req: Request, res: Response, next: NextFunction) {
   const data = await ClientModel.find();
@@ -352,12 +347,14 @@ function lowestCity(clients: ClientInterface[]) {
     value: "",
   };
 
-  const data = {};
+  let data = {};
 
   map.forEach((value, key, arr) => {
     data[key] =
       value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
   });
+
+  data = Statistics.absoluteToPercent(data);
 
   result.title = "Qual a cidade que menos busca crédito?";
   result.value = Statistics.lowest(data).label;
@@ -490,7 +487,7 @@ function chartMedianByAge(clients: ClientInterface[]) {
     }
   });
 
-  const result: { [k: string]: number } = {};
+  let result: { [k: string]: number } = {};
 
   map.forEach((value, key) => {
     result[key] = +(
@@ -499,6 +496,8 @@ function chartMedianByAge(clients: ClientInterface[]) {
       }, 0) / value.length
     ).toFixed(2);
   });
+
+  result = Statistics.absoluteToPercent(result);
 
   const pie = new Pie()
     .withLabels(Object.keys(result))
@@ -547,15 +546,22 @@ function chartLineByAge(clients: ClientInterface[]) {
 
   line.withLabels(Array.from(map.keys()));
 
-  const dataset = line.newDataset("Credit By Age");
+  const dataset = line.newDataset("Crédito por idade");
 
-  map.forEach((value: ClientInterface[], key) => {
-    dataset.withValues({
-      value: +(
-        value.reduce((acc, client) => acc + client.credit, 0) / value.length
-      ).toFixed(2),
-      color: colors[7],
-    });
+  let result: { [k: string]: number } = {};
+
+  map.forEach((value, key) => {
+    result[key] = +(
+      value.reduce((acc: number, client: ClientInterface) => {
+        return acc + client.credit;
+      }, 0) / value.length
+    ).toFixed(2);
+  });
+
+  result = Statistics.absoluteToPercent(result);
+
+  Object.entries(result).forEach(([key, value], index) => {
+    dataset.withValues({ value, color: colors[10] });
   });
 
   return line.toObject();

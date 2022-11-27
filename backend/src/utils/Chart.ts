@@ -14,6 +14,18 @@ class Dataset {
     return this;
   }
 
+  get colors() {
+    return this._colors;
+  }
+
+  get values() {
+    return this._values.sort((a, b) => a - b).reverse();
+  }
+
+  get label() {
+    return this._label;
+  }
+
   toObject() {
     return {
       data: this._values.sort((a, b) => a - b).reverse(),
@@ -124,8 +136,110 @@ export class Pie extends Chart {
 
 export class Bar extends Chart {
   protected type: string = "bar";
+
+  toObject() {
+    const object = {
+      type: this.type,
+      chartData: {
+        labels: Array.from(this.labels).sort(),
+        datasets: this._datasets.map((dataset) => ({
+          data: dataset.values,
+          borderColor: dataset.colors,
+          backgroundColor: dataset.colors,
+          label: dataset.label,
+        })),
+      },
+      chartOptions: {
+        scales: {},
+        plugins: {
+          title: {
+            display: true,
+            text: this.title,
+            color: "black",
+            align: "start",
+          },
+        },
+      },
+      insights: this.insights,
+      source: this.source,
+    };
+
+    if (this.axis.y)
+      object.chartOptions.scales = {
+        y: {
+          title: {
+            display: true,
+            text: this.axis.y,
+          },
+        },
+      };
+
+    if (this.axis.x) {
+      object.chartOptions.scales = {
+        x: {
+          title: {
+            display: true,
+            text: this.axis.x,
+          },
+        },
+      };
+    }
+
+    return object;
+  }
 }
 
 export class Line extends Chart {
   protected type: string = "line";
+
+  toObject() {
+    const object = {
+      type: this.type,
+      chartData: {
+        labels: Array.from(this.labels).sort(),
+        datasets: this._datasets.map((dataset) => ({
+          data: dataset.values,
+          borderColor: dataset.colors,
+          backgroundColor: dataset.colors,
+          label: dataset.label,
+        })),
+      },
+      chartOptions: {
+        scales: {},
+        plugins: {
+          title: {
+            display: true,
+            text: this.title,
+            color: "black",
+            align: "start",
+          },
+        },
+      },
+      insights: this.insights,
+      source: this.source,
+    };
+
+    if (this.axis.y)
+      object.chartOptions.scales = {
+        y: {
+          title: {
+            display: true,
+            text: this.axis.y,
+          },
+        },
+      };
+
+    if (this.axis.x) {
+      object.chartOptions.scales = {
+        x: {
+          title: {
+            display: true,
+            text: this.axis.x,
+          },
+        },
+      };
+    }
+
+    return object;
+  }
 }

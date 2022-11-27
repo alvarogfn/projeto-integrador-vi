@@ -20,6 +20,12 @@ const port = parseInt(process.env.PORT ?? "3000");
 
 moongose.connect("mongodb://localhost:27017/projetovi").then(
   async () => {
+    await FakePopulate();
+    await FakePopulate();
+    await FakePopulate();
+    await FakePopulate();
+    await FakePopulate();
+
     app.listen(port, hostname, () => {
       const url = `http://${hostname}:${port}`;
       console.log("Your app is running: " + url);

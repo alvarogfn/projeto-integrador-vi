@@ -113,10 +113,4 @@ export function groupByAge(clients: ClientInterface[]) {
   return map;
 }
 
-export function absToPercent(object: { [key: string]: number }) {
-  const total = Object.entries(object).reduce((acc, [_, value]) => {
-    return acc + value;
-  }, 0);
 
-  console.log(total);
-}

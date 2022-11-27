@@ -49,4 +49,16 @@ export class Statistics {
 
     return (values[half - 1] + values[half]) / 2.0;
   }
+
+  static absoluteToPercent(object: { [key: string]: number }) {
+    const total = Object.entries(object).reduce((acc, [_, value]) => {
+      return acc + value;
+    }, 0);
+
+    return Object.entries(object).reduce((acc, [key, value]) => {
+      acc[key] = +((100 * value) / total).toFixed(2);
+
+      return acc;
+    }, {} as { [k: string]: number });
+  }
 }
