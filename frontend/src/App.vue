@@ -1,13 +1,7 @@
 <template>
-  <div>
-    <header-component />
-    <router-view> </router-view>
-  </div>
+  <div></div>
 </template>
 
-<script>
-  import HeaderComponent from "./components/header/header-component.vue";
-  export default { components: { HeaderComponent } };
-</script>
+<script setup lang="ts"></script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>
