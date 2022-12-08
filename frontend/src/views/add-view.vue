@@ -1,61 +1,79 @@
 <template>
-  <div>
-    <form @submit.prevent="">
-      <h1>Cadastre Novos Dados</h1>
-      <div>
-        <label for="">
-          Cidade
-          <input type="text" />
-        </label>
-        <label for="">
-          Data de Nascimento
-          <input type="date" />
-        </label>
-        <label for="">
-          Crédito
-          <input type="number" />
-        </label>
-      </div>
-      <button>Inserir</button>
+  <div class="add">
+    <h1 class="add__title">Cadastre um novo registro</h1>
+    <form class="add__form" @submit.prevent="submit">
+      <h1 class="add__form-title">Informações sobre o cliente</h1>
+      <form-input-select
+        v-model:value="city"
+        label="Cidade*"
+        required
+        :options="['Buritis', 'Paracatu']"
+      />
+      <form-input
+        v-model:value="birhtdate"
+        label="Data de Nascimento*"
+        type="date"
+        required
+      />
+      <form-input
+        v-model:value.number="credit"
+        label="Crédito*"
+        type="number"
+        required
+      />
+      <form-submit></form-submit>
     </form>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import FormInput from "@/components/form/form-input.vue";
+  import FormInputSelect from "@/components/form/form-input-select.vue";
+  import FormSubmit from "@/components/form/form-submit.vue";
+  import { ref } from "vue";
+
+  const city = ref("");
+  const birhtdate = ref("");
+  const credit = ref(0);
+
+  async function submit() {
+    console.log(city.value, birhtdate.value, credit.value);
+    // const response = await fetch("http://localhost:3000/create", {
+    //   method: "POST",
+    //   body: JSON.stringify({
+    //     city: city.value,
+    //     birhtdate: city.value,
+    //     credit: city.value,
+    //   }),
+    // });
+  }
+</script>
 
 <style lang="scss" scoped>
   @use "@/styles/colors.scss" as *;
 
-  h1 {
-    font-weight: 700;
-    font-size: 1.5rem;
-    text-align: center;
-    padding: 10px;
-  }
+  .add {
+    margin: 15px;
 
-  form {
-    margin: 10px;
-    @include card();
+    &__title {
+      font-size: 0.9rem;
+      color: gray;
+      font-weight: 600;
+      margin: 20px 0;
+    }
 
-    display: flex;
-    flex-flow: column nowrap;
-    row-gap: 20px;
-  }
+    &__form-title {
+      font-weight: 500;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
 
-  label {
-    display: flex;
-    flex-flow: column nowrap;
-    margin: 10px 0;
-  }
+    &__form {
+      @include card($color: transparent, $padding: 20px);
 
-  input {
-    margin-top: 5px;
-    padding: 10px;
-    border: 1px solid black;
-  }
-
-  button {
-    align-self: flex-end;
-    @include button($padding: 10px 30px);
+      display: flex;
+      flex-flow: column nowrap;
+      row-gap: 30px;
+    }
   }
 </style>
