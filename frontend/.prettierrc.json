@@ -1,1 +1,4 @@
-{}
+{
+  "vueIndentScriptAndStyle": true,
+  "endOfLine": "auto"
+}
