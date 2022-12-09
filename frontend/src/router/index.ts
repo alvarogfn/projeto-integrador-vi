@@ -1,9 +1,11 @@
 import LoginView from "@/views/login-view.vue";
 import HomeView from "@/views/home-view.vue";
-import DatasetView from "@/views/dataset-view.vue";
 import AppView from "@/views/app-view.vue";
-import AddView from "@/views/add-view.vue";
-import AnalyticsView from "@/views/analytics-view.vue";
+import ClientsFormView from "@/views/clients/clients-form-view.vue";
+import ClientsAnalyticsView from "@/views/clients/clients-analytics-view.vue";
+import ClientsDatasetView from "@/views/clients/clients-dataset-view.vue";
+import ClientsView from "@/views/clients/clients-view.vue";
+
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
@@ -18,9 +20,24 @@ const router = createRouter({
       component: AppView,
       children: [
         { path: "", name: "home", component: HomeView },
-        { path: "add", name: "add", component: AddView },
-        { path: "dataset", name: "dataset", component: DatasetView },
-        { path: "analytics", name: "analytics", component: AnalyticsView },
+        {
+          path: "clients",
+          name: "clients",
+          component: ClientsView,
+          children: [
+            { path: "form", name: "clients-form", component: ClientsFormView },
+            {
+              path: "dataset",
+              name: "clients-dataset",
+              component: ClientsDatasetView,
+            },
+            {
+              path: "analytics",
+              name: "clients-analytics",
+              component: ClientsAnalyticsView,
+            },
+          ],
+        },
       ],
     },
   ],

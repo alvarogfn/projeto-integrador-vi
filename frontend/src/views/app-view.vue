@@ -1,10 +1,20 @@
 <template>
-  <header-component></header-component>
-  <router-view></router-view>
+  <div class="app">
+    <header-component class="app__header"></header-component>
+    <div class="app__route">
+      <router-view></router-view>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-  import HeaderComponent from "@/components/header-component.vue";
+  import HeaderComponent from "@/components/shared/header/header-component.vue";
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+  .app {
+    &__route {
+      margin-left: 250px;
+    }
+  }
+</style>

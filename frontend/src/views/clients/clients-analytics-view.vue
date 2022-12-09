@@ -10,7 +10,12 @@
     </div>
     <div class="analytics__content">
       <bar-chart class="analytics__chart" :data="chartData" />
-      <div class="analytics__details">a</div>
+      <div class="analytics__details">
+        <form>
+          <input type="date" />
+          <input type="date" />
+        </form>
+      </div>
     </div>
   </div>
 </template>
