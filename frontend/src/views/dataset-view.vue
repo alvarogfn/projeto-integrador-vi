@@ -64,6 +64,7 @@
 </template>
 
 <script setup lang="ts">
+  import type { ClientModel } from "@/model/ClientModel";
   import formatDate from "@/utils/formatDate";
   import formatMoney from "@/utils/formatMoney";
   import { ref, watch, onMounted, computed } from "vue";
@@ -71,15 +72,7 @@
   const selectAll = ref<boolean>(false);
   const selected = ref<string[]>([]);
 
-  const dataset = ref<
-    {
-      id: string;
-      city: string;
-      birthdate: number;
-      credit: number;
-      createdAt: number;
-    }[]
-  >([]);
+  const dataset = ref<ClientModel[]>([]);
 
   watch(selected, (newState) => {
     if (newState.length === dataset.value.length && selectAll.value !== true)
@@ -107,16 +100,16 @@
     dataset.value.push({
       id: "123214234",
       city: "Buritis",
-      birthdate: Date.now(),
+      birthdate: Date.now() - 400,
       credit: 9000,
-      createdAt: Date.now(),
+      createdAt: Date.now() - 4000,
     });
     dataset.value.push({
       id: "123214238",
       city: "Buritis",
-      birthdate: Date.now(),
+      birthdate: Date.now() - 30,
       credit: 9000,
-      createdAt: Date.now(),
+      createdAt: Date.now() - 590,
     });
   });
 </script>
