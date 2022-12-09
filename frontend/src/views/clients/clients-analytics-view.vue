@@ -16,6 +16,12 @@
           <input type="date" />
         </form>
       </div>
+      <div class="analytics__details">
+        <form>
+          <input type="date" />
+          <input type="date" />
+        </form>
+      </div>
     </div>
   </div>
 </template>

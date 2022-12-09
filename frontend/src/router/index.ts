@@ -32,7 +32,7 @@ const router = createRouter({
               component: ClientsDatasetView,
             },
             {
-              path: "analytics",
+              path: "analytics/:id",
               name: "clients-analytics",
               component: ClientsAnalyticsView,
             },
