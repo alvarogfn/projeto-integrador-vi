@@ -1,598 +1,259 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientInterface, ClientModel } from "../models/Clients";
-import { Bar, Line, Pie } from "../utils/Chart";
+import { Bar, Doughnut, Line, Pie, Radar } from "../utils/Chart";
+import { FakePopulate } from "../utils/FakePopulate";
+import { pipe } from "../utils/Pipe";
 import { Statistics } from "../utils/Statistics";
-import { colors, groupByAge, groupObjArrayByProperty } from "../utils/Utils";
+import {
+  colors,
+  countObjArrayByProperty,
+  groupByRange,
+  groupObjArrayByProperty,
+  groupObjArrayByPropertyMap,
+  rainbowColors,
+  sortObjArrayByValue,
+} from "../utils/Utils";
 
 export async function charts(req: Request, res: Response, next: NextFunction) {
+  await FakePopulate();
   const data = await ClientModel.find();
   return res.send([
-    chartMedianByAge(data),
-    chartLineByAge(data),
-    {
-      type: "bar",
-      chartData: {
-        labels: ["Suldeste", "Sul", "Nordeste", "Centro-oeste", "Norte"],
-        datasets: [
-          {
-            label: "Jovens",
-            data: [11, 13, 14, 11, 15],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Adultos",
-            data: [15, 13, 14, 12, 15],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Idosos",
-            data: [11, 13, 14, 11, 35],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-        ],
-      },
-      chartOptions: {
-        plugins: {
-          title: {
-            display: true,
-            text: "Qual o consumo de crédito médio por idade e região no Brasil?",
-            color: "black",
-            align: "start",
-          },
-        },
-      },
-    },
-    chartMedianByCity(data),
-    {
-      type: "line",
-      chartData: {
-        labels: ["Jovens", "Adultos", "Idosos"],
-        datasets: [
-          {
-            label: "Nordeste",
-            data: [11, 13, 14],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Suldeste",
-            data: [15, 20, 14],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Sul",
-            data: [14, 13, 2],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Centro-oeste",
-            data: [15, 9, 12],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Norte",
-            data: [5, 6, 8],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-        ],
-      },
-      chartOptions: {
-        plugins: {
-          title: {
-            display: true,
-            text: "Qual o consumo de crédito médio por idade e região no Brasil?",
-            color: "black",
-            align: "start",
-          },
-        },
-      },
-    },
-    {
-      type: "radar",
-      chartData: {
-        labels: ["Jovens", "Adultos", "Idosos"],
-        datasets: [
-          {
-            label: "Nordeste",
-            data: [11, 13, 14],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Suldeste",
-            data: [15, 20, 14],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Sul",
-            data: [14, 13, 2],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Centro-oeste",
-            data: [15, 9, 12],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Norte",
-            data: [5, 6, 8],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-        ],
-      },
-      chartOptions: {
-        plugins: {
-          title: {
-            display: true,
-            text: "Qual o consumo de crédito médio por idade e região no Brasil?",
-            color: "black",
-            align: "start",
-          },
-        },
-      },
-    },
-    {
-      type: "doughnut",
-      chartData: {
-        labels: ["Jovens", "Adultos", "Idosos"],
-        datasets: [
-          {
-            label: "Nordeste",
-            data: [11, 13, 14],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Suldeste",
-            data: [15, 20, 14],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Sul",
-            data: [14, 13, 2],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Centro-oeste",
-            data: [15, 9, 12],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-          {
-            label: "Norte",
-            data: [5, 6, 8],
-            backgroundColor: [
-              "hsla(251, 100%, 10%, 1)",
-              "hsla(251, 100%, 20%, 1)",
-              "hsla(251, 100%, 30%, 1)",
-              "hsla(251, 100%, 40%, 1)",
-              "hsla(251, 100%, 60%, 1)",
-              "hsla(251, 100%, 70%, 1)",
-              "hsla(251, 100%, 90%, 1)",
-            ],
-          },
-        ],
-      },
-      chartOptions: {
-        plugins: {
-          title: {
-            display: true,
-            text: "Qual o consumo de crédito médio por idade e região no Brasil?",
-            color: "black",
-            align: "start",
-          },
-        },
-      },
-    },
+    chartAverageAge(data),
+    chartTendencyAgeLine(data),
+    chartModaAgeBar(data),
+    chartCityBar(data),
+    chartCityLength(data),
+    chartCityAgeAverage(data),
+    chartCityAgeAverageRadar(data),
   ]);
 }
 
-export async function insights(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const clients = await ClientModel.find();
-
-  res
-    .status(200)
-    .send([
-      biggestAge(clients),
-      lowestAge(clients),
-      biggestRegion(clients),
-      lowestRegion(clients),
-      biggestCity(clients),
-      lowestCity(clients),
-    ]);
-}
-
-function lowestCity(clients: ClientInterface[]) {
-  const group = groupObjArrayByProperty(clients, "address.city");
-  const map = new Map(Object.entries(group));
-
-  const result = {
-    title: "",
-    value: "",
-  };
-
-  let data = {};
-
-  map.forEach((value, key, arr) => {
-    data[key] =
-      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
-  });
-
-  data = Statistics.absoluteToPercent(data);
-
-  result.title = "Qual a cidade que menos busca crédito?";
-  result.value = Statistics.lowest(data).label;
-
-  return result;
-}
-
-function biggestCity(clients: ClientInterface[]) {
-  const group = groupObjArrayByProperty(clients, "address.city");
-  const map = new Map(Object.entries(group));
-
-  const result = {
-    title: "",
-    value: "",
-  };
-
-  const data = {};
-
-  map.forEach((value, key, arr) => {
-    data[key] =
-      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
-  });
-
-  result.title = "Qual a cidade que mais busca crédito?";
-  result.value = Statistics.biggest(data).label;
-
-  return result;
-}
-
-function biggestAge(clients: ClientInterface[]) {
-  const group = groupByAge(clients);
-
-  const result = {
-    title: "",
-    value: "",
-  };
-
-  const data = {};
-
-  group.forEach((value, key, arr) => {
-    data[key] =
-      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
-  });
-
-  result.title = "Qual a faixa etária que mais busca crédito?";
-  result.value = Statistics.biggest(data).label;
-
-  return result;
-}
-
-function lowestAge(clients: ClientInterface[]) {
-  const group = groupByAge(clients);
-
-  const result = {
-    title: "",
-    value: "",
-  };
-
-  const data = {};
-
-  group.forEach((value, key, arr) => {
-    data[key] =
-      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
-  });
-
-  result.title = "Qual faixa etária que menos busca crédito?";
-  result.value = Statistics.lowest(data).label;
-
-  return result;
-}
-
-function biggestRegion(clients: ClientInterface[]) {
-  const group = groupObjArrayByProperty(clients, "address.region");
-  const map = new Map(Object.entries(group));
-
-  const result = {
-    title: "",
-    value: "",
-  };
-
-  const data = {};
-
-  map.forEach((value, key, arr) => {
-    data[key] =
-      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
-  });
-
-  result.title = "Qual a região que mais busca crédito?";
-  result.value = Statistics.biggest(data).label;
-
-  return result;
-}
-
-function lowestRegion(clients: ClientInterface[]) {
-  const group = groupObjArrayByProperty(clients, "address.region");
-  const map = new Map(Object.entries(group));
-
-  const result = {
-    title: "",
-    value: "",
-  };
-
-  const data = {};
-
-  map.forEach((value, key, arr) => {
-    data[key] =
-      value.reduce((acc, actual) => acc + actual.credit, 0) / value.length;
-  });
-
-  result.title = "Qual a região que menos busca crédito?";
-  result.value = Statistics.lowest(data).label;
-
-  return result;
-}
-
-function chartMedianByAge(clients: ClientInterface[]) {
-  const map = new Map();
-
-  map.set("Jovens", []);
-  map.set("Adultos", []);
-  map.set("Idosos", []);
-
-  clients.forEach((client) => {
-    if (client.age >= 18 && client.age <= 39) {
-      map.get("Jovens").push(client);
-    } else if (client.age >= 40 && client.age <= 59) {
-      map.get("Adultos").push(client);
-    } else {
-      map.get("Idosos").push(client);
-    }
-  });
+function chartAverageAge(clients: ClientInterface[]) {
+  const map = groupByRange(
+    clients,
+    { Jovens: [18, 30], Adultos: [31, 50], Idosos: [51, 80] },
+    "age"
+  );
 
   let result: { [k: string]: number } = {};
 
   map.forEach((value, key) => {
-    result[key] = +(
-      value.reduce((acc: number, client: ClientInterface) => {
-        return acc + client.credit;
-      }, 0) / value.length
+    result[key] = +Statistics.average(
+      value.map((value) => value.credit)
     ).toFixed(2);
   });
 
   result = Statistics.absoluteToPercent(result);
+  const sortedResult = sortObjArrayByValue(result);
 
-  const pie = new Pie()
-    .withLabels(Object.keys(result))
-    .withTitle("Quanto de crédito é buscado em média por idade? ");
+  const pie = new Pie().withTitle(
+    "Quanto de crédito é buscado em média por idade? "
+  );
 
   const dataset = pie.newDataset("Crédito por Faixa Etária");
 
-  Object.values(result).forEach((value, index) => {
-    dataset.withValues({ value, color: colors[index * 2] });
+  let color = 0;
+  sortedResult.forEach((value, index) => {
+    pie.withLabels(index);
+    dataset.withValues({ value, color: colors[color] });
+    color += 1;
   });
 
   return pie.toObject();
 }
 
-function chartLineByAge(clients: ClientInterface[]) {
-  const map = new Map();
+function chartTendencyAgeLine(clients: ClientInterface[]) {
+  const map = groupByRange(
+    clients,
+    {
+      "18-27 anos": [18, 27],
+      "28-37 anos": [28, 37],
+      "38-47 anos": [38, 47],
+      "48-57 anos": [48, 57],
+      "58-67 anos": [58, 67],
+      "68-80 anos": [68, 80],
+    },
+    "age"
+  );
 
-  map.set(20, []);
-  map.set(30, []);
-  map.set(40, []);
-  map.set(50, []);
-  map.set(60, []);
-  map.set(70, []);
+  const result: { [k: string]: number } = {};
 
-  clients.forEach((client) => {
-    if (client.age < 30) {
-      map.get(20).push(client);
-    } else if (client.age < 40) {
-      map.get(30).push(client);
-    } else if (client.age < 50) {
-      map.get(40).push(client);
-    } else if (client.age < 60) {
-      map.get(50).push(client);
-    } else if (client.age < 70) {
-      map.get(60).push(client);
-    } else if (client.age <= 80) {
-      map.get(70).push(client);
-    }
+  map.forEach((value, key) => {
+    result[key] = +Statistics.average(
+      value.map((value) => value.credit)
+    ).toFixed(2);
   });
 
-  const line = new Line()
-    .withTitle(
-      "O qual a tendência de consumo de crédito ao longo das faixas etárias?"
-    )
-    .withAxis({ x: "Idade", y: "Média de Crédito em Reais" });
+  const line = new Line().withTitle("Tendencia de captação de crédito");
 
-  line.withLabels(Array.from(map.keys()));
+  const dataset = line
+    .withLabels(Object.keys(result))
+    .newDataset("Porcentagem");
 
-  const dataset = line.newDataset("Crédito por idade");
+  Object.values(result).forEach((value) =>
+    dataset.withValues({
+      value: value,
+      color: colors[14],
+    })
+  );
+
+  return line.toObject();
+}
+
+function chartModaAgeBar(clients: ClientInterface[]) {
+  const map = groupByRange(
+    clients,
+    {
+      "0-1000 R$": [0, 1000],
+      "1001-5000 R$": [1000, 5000],
+      "5001-10000 R$": [5001, 10000],
+      "10000 ou mais R$": [10000, Infinity],
+    },
+    "credit"
+  );
 
   let result: { [k: string]: number } = {};
 
   map.forEach((value, key) => {
-    result[key] = +(
-      value.reduce((acc: number, client: ClientInterface) => {
-        return acc + client.credit;
-      }, 0) / value.length
+    result[key] = value.length;
+  });
+
+  result = Statistics.absoluteToPercent(result);
+
+  const bar = new Bar().withTitle(
+    "Quantidade de pessoas buscando por X faixa de crédito."
+  );
+
+  const dataset = bar.withLabels(Object.keys(result)).newDataset("Porcentagem");
+
+  Object.values(result).forEach((value) =>
+    dataset.withValues({
+      value: value,
+      color: colors[14],
+    })
+  );
+
+  return bar.toObject();
+}
+
+function chartCityBar(clients: ClientInterface[]) {
+  const map = groupObjArrayByProperty(clients, "city");
+
+  let result: { [k: string]: number } = {};
+
+  Object.keys(map).forEach((key) => {
+    result[key] = +Statistics.average(
+      map[key].map((client) => client.credit)
     ).toFixed(2);
   });
 
   result = Statistics.absoluteToPercent(result);
 
-  Object.entries(result).forEach(([key, value], index) => {
-    dataset.withValues({ value, color: colors[10] });
-  });
+  const bar = new Bar().withTitle(
+    "Quantidade de crédito buscado por cidade do noroeste mineiro"
+  );
 
-  return line.toObject();
+  const dataset = bar.withLabels(Object.keys(result)).newDataset("Porcentagem");
+
+  Object.values(result).forEach((value) =>
+    dataset.withValues({
+      value: value,
+      color: colors[14],
+    })
+  );
+
+  return bar.toObject();
 }
 
-function chartMedianByCity(clients: ClientInterface[]) {
-  const group = groupObjArrayByProperty(clients, "address.city");
+function chartCityLength(clients: ClientInterface[]) {
+  const map = groupObjArrayByProperty(clients, "city");
 
-  const cities = Object.keys(group);
+  let result: { [k: string]: number } = {};
 
-  const bar = new Bar()
-    .withLabels(cities)
-    .withTitle(
-      "Qual o consumo médio de crédito nas cidades do noroeste mineiro"
-    )
-    .withAxis({ y: "Montante de Crédito", x: "Cidade" });
-  const dataset = bar.newDataset("Cidades");
+  Object.keys(map).forEach((key) => {
+    result[key] = map[key].length;
+  });
 
-  Object.keys(group).forEach((key, index) => {
-    const value = +(
-      group[key].reduce((acc, client) => acc + client.credit, 0) /
-      group[key].length
-    ).toFixed(2);
+  result = Statistics.absoluteToPercent(result);
 
-    dataset.withValues({ value, color: colors[index] });
+  const bar = new Bar().withTitle(
+    "Quantidade de pessoas buscado crédito por cidade do noroeste mineiro"
+  );
+
+  const dataset = bar.withLabels(Object.keys(result)).newDataset("Porcentagem");
+
+  Object.values(result).forEach((value) =>
+    dataset.withValues({
+      value: value,
+      color: colors[3],
+    })
+  );
+
+  return bar.toObject();
+}
+
+function chartCityAgeAverage(clients: ClientInterface[]) {
+  const city = groupObjArrayByProperty(clients, "city");
+  const age = Object.entries(city).map(([key, client]) => {
+    return {
+      [key]: groupByRange(
+        client,
+        { Jovens: [18, 30], Adultos: [31, 50], Idosos: [51, 80] },
+        "age"
+      ),
+    };
+  });
+
+  const bar = new Line().withTitle(
+    "Quantidade de pessoas buscado crédito por cidade do noroeste mineiro"
+  );
+
+  let counter = 0;
+  age.forEach((item) => {
+    Object.keys(item).forEach((city) => {
+      bar.withLabels([...item[city].keys()]);
+      const dataset = bar.newDataset(city);
+      item[city].forEach((clients, key) => {
+        const total =
+          clients.reduce((acc, clients) => acc + clients.credit, 0) /
+          clients.length;
+        dataset.withValues({ value: total, color: colors[counter] });
+      });
+    });
+    counter += 2;
   });
 
   return bar.toObject();
 }
 
+function chartCityAgeAverageRadar(clients: ClientInterface[]) {
+  const groupByAge = groupByRange(
+    clients,
+    { Jovens: [18, 30], Adultos: [31, 50], Idosos: [51, 80] },
+    "age"
+  );
+
+  const cities = Array.from(new Set(clients.map((client) => client.city)));
+
+  const radar = new Radar().withLabels([...cities]);
+
+  let color = 0;
+  groupByAge.forEach((clients, key) => {
+    const dataset = radar.newDataset(key);
+    cities.forEach((city) => {
+      const value = [];
+      clients.forEach((client) => {
+        if (client.city === city) value.push(client.credit);
+      });
+      const average = Statistics.average(value);
+      dataset.withValues({ value: average, color: colors[color] });
+    });
+    color += 2;
+  });
+
+  return radar.toObject();
+}
+
 export default {
   charts,
-  insights,
 };

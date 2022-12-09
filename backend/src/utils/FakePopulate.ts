@@ -2,7 +2,6 @@ import fakerBr from "faker-br";
 import { faker } from "@faker-js/faker";
 import { ClientModel } from "../models/Clients";
 
-const regioes = ["Norte", "Nordeste", "Centro-oeste", "Suldeste", "Sul"];
 const cidades = ["Unai", "Paracatu", "Vazante", "Buritis", "Arinos"];
 
 function random<T>(arr: T[]) {
@@ -15,13 +14,9 @@ export async function FakePopulate() {
   const model = await ClientModel.create({
     name: faker.name.fullName(),
     cpf: fakerBr.br.cpf(),
-    address: {
-      state: faker.address.state(),
-      city: random(cidades),
-      region: random(regioes),
-    },
+    city: random(cidades),
     birthdate: faker.date.birthdate(),
-    credit: faker.finance.amount(),
+    credit: faker.finance.amount(0, 12000, 0),
   });
 
   await model.save();

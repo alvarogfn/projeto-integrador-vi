@@ -19,7 +19,7 @@ class Dataset {
   }
 
   get values() {
-    return this._values.sort((a, b) => a - b).reverse();
+    return this._values;
   }
 
   get label() {
@@ -28,7 +28,7 @@ class Dataset {
 
   toObject() {
     return {
-      data: this._values.sort((a, b) => a - b).reverse(),
+      data: this._values,
       label: this._label,
       backgroundColor: this._colors,
     };
@@ -67,8 +67,12 @@ export abstract class Chart {
     return this;
   }
 
-  withLabels(labels: string[]) {
-    labels.forEach((label) => this.labels.add(label));
+  withLabels(labels: string[] | string) {
+    if (Array.isArray(labels)) {
+      labels.forEach((label) => this.labels.add(label));
+      return this;
+    }
+    this.labels.add(labels);
     return this;
   }
 
@@ -83,11 +87,15 @@ export abstract class Chart {
     return this;
   }
 
+  getLabels() {
+    return this.labels;
+  }
+
   toObject() {
     const object = {
       type: this.type,
       chartData: {
-        labels: Array.from(this.labels).sort(),
+        labels: Array.from(this.labels),
         datasets: this._datasets.map((dataset) => dataset.toObject()),
       },
       chartOptions: {
@@ -141,7 +149,7 @@ export class Bar extends Chart {
     const object = {
       type: this.type,
       chartData: {
-        labels: Array.from(this.labels).sort(),
+        labels: Array.from(this.labels),
         datasets: this._datasets.map((dataset) => ({
           data: dataset.values,
           borderColor: dataset.colors,
@@ -196,7 +204,66 @@ export class Line extends Chart {
     const object = {
       type: this.type,
       chartData: {
-        labels: Array.from(this.labels).sort(),
+        labels: Array.from(this.labels),
+        datasets: this._datasets.map((dataset) => ({
+          data: dataset.values,
+          borderColor: dataset.colors,
+          backgroundColor: dataset.colors,
+          label: dataset.label,
+        })),
+      },
+      chartOptions: {
+        scales: {},
+        plugins: {
+          title: {
+            display: true,
+            text: this.title,
+            color: "black",
+            align: "start",
+          },
+        },
+      },
+      insights: this.insights,
+      source: this.source,
+    };
+
+    if (this.axis.y)
+      object.chartOptions.scales = {
+        y: {
+          title: {
+            display: true,
+            text: this.axis.y,
+          },
+        },
+      };
+
+    if (this.axis.x) {
+      object.chartOptions.scales = {
+        x: {
+          title: {
+            display: true,
+            text: this.axis.x,
+          },
+        },
+      };
+    }
+
+    return object;
+  }
+}
+
+export class Doughnut extends Chart {
+  protected type: string = "doughnut";
+}
+
+export class Radar extends Chart {
+  protected type: string = "radar";
+
+  toObject() {
+    const object = {
+      type: this.type,
+      chartData: {
+        labels: Array.from(this.labels),
         datasets: this._datasets.map((dataset) => ({
           data: dataset.values,
           borderColor: dataset.colors,

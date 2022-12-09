@@ -67,6 +67,7 @@ export function groupObjArrayByProperty<T, K extends string>(
   data: T[],
   properties: K
 ): { [k: string]: T[] } {
+
   return data.reduce((group, obj) => {
     const property = accessNestedProperty(obj, properties);
     if (group[property] === undefined) {
@@ -76,6 +77,24 @@ export function groupObjArrayByProperty<T, K extends string>(
     group[property].push(obj);
     return group;
   }, {} as { [k: string]: T[] });
+
+}
+
+export function groupObjArrayByPropertyMap<T, K extends string>(
+  data: T[],
+  properties: K
+) {
+  return data.reduce((group, obj) => {
+    const property = accessNestedProperty(obj, properties);
+    if (group.get(property) === undefined) {
+      group.set(property, [obj]);
+      return group;
+    }
+    group.get(property)!.push(obj);
+    group[property].push(obj);
+    return group;
+  }, new Map<K, T[]>());
+
 }
 
 export function countObjArrayByProperty<T>(
@@ -93,24 +112,32 @@ export function countObjArrayByProperty<T>(
   return obj;
 }
 
-export function groupByAge(clients: ClientInterface[]) {
-  const map = new Map<"Jovens" | "Adultos" | "Idosos", ClientInterface[]>();
-
-  map.set("Jovens", []);
-  map.set("Adultos", []);
-  map.set("Idosos", []);
-
-  clients.forEach((client) => {
-    if (client.age >= 18 && client.age <= 39) {
-      map.get("Jovens")?.push(client);
-    } else if (client.age >= 40 && client.age <= 59) {
-      map.get("Adultos")?.push(client);
-    } else {
-      map.get("Idosos")?.push(client);
-    }
-  });
+export function groupByRange<T>(objArr: T[], delimiter: { [k: string]: [number, number] }, properties: string) {
+  const map = new Map<string, T[]>();
+  objArr.forEach(item => {
+    const property = accessNestedProperty(item, properties);
+    Object.entries(delimiter).forEach(([key, value]) => {
+      if (map.get(key) === undefined) map.set(key, []);
+      if (property > value[0] && property < value[1]) map.get(key)!.push(item);
+    })
+  })
 
   return map;
 }
 
+export function sortObjArrayByValue(object: { [k: string]: number }) {
+  const values = Object.values(object);
+  const map = new Map(Object.entries(object));
 
+  values.sort((a, b) => a - b).reverse();
+
+  const data = values.reduce((prev, current) => {
+    map.forEach((value, key) => {
+      if (value === current) prev.set(key, current);
+    });
+
+    return prev;
+  }, new Map<string, number>());
+
+  return data;
+}

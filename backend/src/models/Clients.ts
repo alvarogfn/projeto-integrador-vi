@@ -2,51 +2,31 @@ import mongoose from "mongoose";
 import moment from "moment";
 
 export interface ClientInterface {
-  name: string;
-  cpf: string;
-  birthdate: Date;
-  address: {
-    state: string;
-    city: string;
-    region: string;
-  };
+  birthdate: number;
+  city: string;
   credit: number;
-  age: number;
+  createdAt: number;
 }
 
-const ClientSchema = new mongoose.Schema<ClientInterface>(
-  {
-    name: {
-      type: String,
-      required: true,
-    },
-    cpf: {
-      type: String,
-      required: true,
-    },
-    birthdate: {
-      type: Date,
-      required: true,
-    },
-    address: {
-      state: String,
-      city: String,
-      region: String,
-    },
-    credit: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
+const ClientSchema = new mongoose.Schema<ClientInterface>({
+  birthdate: {
+    type: Number,
+    required: true,
   },
-  {
-    methods: {
-      groupBy<U extends keyof ClientInterface>(k: U) {
-        return mongoose.model("Clients").find();
-      },
-    },
-  }
-);
+  city: {
+    type: String,
+    required: true,
+  },
+  credit: {
+    type: Number,
+    required: true,
+  },
+  createdAt: {
+    type: Number,
+    required: true,
+    default: Date.now(),
+  },
+});
 
 ClientSchema.set("virtuals", true);
 ClientSchema.set("toJSON", { virtuals: true });
