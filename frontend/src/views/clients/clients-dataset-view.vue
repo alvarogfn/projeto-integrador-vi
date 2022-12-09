@@ -56,8 +56,8 @@
           </tr>
         </tbody>
       </table>
-      <h1 v-else>
-        Não existem dados a serem computados, que tal adicionar alguns?
+      <h1 class="dataset__empty" v-else>
+        Não existem dados a serem mostrados, que tal adicionar alguns?
       </h1>
     </section>
   </div>
@@ -97,20 +97,20 @@
   }
 
   onMounted(async () => {
-    dataset.value.push({
-      id: "123214234",
-      city: "Buritis",
-      birthdate: Date.now() - 400,
-      credit: 9000,
-      createdAt: Date.now() - 4000,
-    });
-    dataset.value.push({
-      id: "123214238",
-      city: "Buritis",
-      birthdate: Date.now() - 30,
-      credit: 9000,
-      createdAt: Date.now() - 590,
-    });
+    // dataset.value.push({
+    //   id: "123214234",
+    //   city: "Buritis",
+    //   birthdate: Date.now() - 400,
+    //   credit: 9000,
+    //   createdAt: Date.now() - 4000,
+    // });
+    // dataset.value.push({
+    //   id: "123214238",
+    //   city: "Buritis",
+    //   birthdate: Date.now() - 30,
+    //   credit: 9000,
+    //   createdAt: Date.now() - 590,
+    // });
   });
 </script>
 
@@ -121,9 +121,11 @@
     margin: 15px;
 
     &__title {
-      font-size: 0.9rem;
+      font-weight: 700;
       color: gray;
-      font-weight: 600;
+
+      text-transform: uppercase;
+      font-size: 0.9rem;
       margin: 20px 0;
     }
 
@@ -134,9 +136,24 @@
       padding: 10px;
     }
 
+    &__empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      height: 150px;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
     &__content {
       @include card($color: transparent);
       font-size: 0.8rem;
+
+      input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+      }
     }
 
     &__button {
@@ -154,14 +171,14 @@
     width: 100%;
 
     &__head {
-      background-color: rgba($color: $color-2, $alpha: 0.3);
-      color: darken($color: $color-2, $amount: 30%);
+      background-color: rgba($color: $color-1, $alpha: 0.3);
+      color: darken($color: $color-1, $amount: 30%);
       font-weight: 500;
 
       td {
         vertical-align: middle;
         border-style: solid none;
-        padding: 10px;
+        padding: 15px;
 
         &:last-child {
           border-bottom-right-radius: 10px;
@@ -189,7 +206,7 @@
       }
 
       td {
-        padding: 10px;
+        padding: 15px;
         vertical-align: middle;
         height: 20px;
 
@@ -205,123 +222,4 @@
       }
     }
   }
-
-  // .dataset {
-  //   @include card($color: transparent);
-
-  //   margin: 10px;
-
-  //   &__title {
-  //     font-weight: 600;
-  //     margin: 20px 0;
-  //     font-size: 1.4rem;
-  //   }
-
-  //   &__table {
-  //     width: 100%;
-  //     height: 300px;
-  //     overflow-y: scroll;
-
-  //     td {
-  //       margin-bottom: 10px;
-
-  //       transition: 10ms;
-
-  //       &:nth-child(1) {
-  //         width: 70px;
-  //       }
-
-  //       &:nth-child(2) {
-  //         width: 50px;
-  //       }
-
-  //       &:nth-child(3) {
-  //         width: 500px;
-  //       }
-
-  //       &:nth-child(4) {
-  //         width: 150px;
-  //       }
-
-  //       &:nth-child(5) {
-  //         width: 190px;
-  //       }
-  //     }
-  //   }
-
-  //   &__table-header {
-  //     width: 100%;
-  //     display: table;
-  //     table-layout: fixed;
-  //     color: #1d1d1d;
-
-  //     border-radius: 5px;
-
-  //     overflow: hidden;
-
-  //     font-weight: 500;
-  //     font-size: 0.95rem;
-
-  //     margin-bottom: 10px;
-
-  //     td {
-  //       background-color: darken($color: #fff, $amount: 5%);
-  //       border-style: solid none;
-  //       padding: 10px;
-  //     }
-  //   }
-
-  //   &__table-body {
-  //     display: block;
-
-  //     height: 400px;
-  //     overflow-y: scroll;
-
-  //     tr {
-  //       display: table;
-  //       table-layout: fixed;
-  //       width: 100%;
-
-  //       &:nth-child(even) {
-  //         td {
-  //           background-color: darken($color: #fff, $amount: 3%);
-  //         }
-  //       }
-  //     }
-
-  //     td {
-  //       font-size: 0.9rem;
-
-  //       height: 50px;
-  //       vertical-align: middle;
-  //       border-style: solid none;
-  //       padding: 10px;
-
-  //       &:last-child {
-  //         border-bottom-right-radius: 10px;
-  //         border-top-right-radius: 10px;
-  //       }
-
-  //       &:first-child {
-  //         border-top-left-radius: 10px;
-  //         border-bottom-left-radius: 10px;
-  //       }
-  //     }
-
-  //     input {
-  //       cursor: pointer;
-
-  //       width: 20px;
-  //       height: 20px;
-  //     }
-  //   }
-
-  //   &__table-row {
-  //     &--selected {
-  //       td {
-  //         background-color: rgba($color: $color-1, $alpha: 0.1) !important;
-  //       }
-  //     }
-  //   }
-  // }
 </style>
