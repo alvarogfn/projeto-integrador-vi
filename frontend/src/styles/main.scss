@@ -13,7 +13,8 @@ body {
   background-color: #f1f1f1;
 }
 
-input, select {
+input,
+select {
   font-family: inherit;
   outline: initial;
   border: initial;
@@ -32,5 +33,9 @@ a {
   text-decoration: initial;
   color: inherit;
 
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
   cursor: pointer;
 }
