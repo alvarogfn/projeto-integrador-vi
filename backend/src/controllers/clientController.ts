@@ -29,20 +29,27 @@ export function post(
   req: Request<
     {},
     {},
-    { birthdate: number; city: string; credit: number; preferences: number[] }
+    {
+      birthdate: number;
+      city: string;
+      credit: number;
+      preferences: number[];
+      sex: string;
+    }
   >,
   res: Response<{}, { USER_ID: string }>,
   next: NextFunction
 ) {
   (async () => {
     const userId = res.locals.USER_ID;
-    const { birthdate, city, credit, preferences } = req.body;
+    const { birthdate, city, credit, preferences, sex } = req.body;
     const newClient = new ClientModel({
       createdBy: userId,
       birthdate,
       city,
       credit,
       preferences,
+      sex,
     });
     const response = await newClient.save();
     return res.status(200).send(response);

@@ -8,6 +8,7 @@
     <select
       class="label__input"
       :id="props.id"
+      :required="required"
       @input="emit('update:value', ($event.target as HTMLInputElement).value)"
     >
       <option value="" selected disabled>{{ placeholder }}</option>

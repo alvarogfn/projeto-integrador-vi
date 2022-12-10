@@ -47,8 +47,6 @@
 
   const router = useRouter();
 
-  const appStore = useAppStore();
-
   const user = reactive({ name: "", username: "", password: "" });
 
   const error = ref(false);

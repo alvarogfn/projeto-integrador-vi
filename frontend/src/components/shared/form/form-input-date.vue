@@ -10,13 +10,14 @@
       type="date"
       :id="props.id"
       :placeholder="props.placeholder ?? props.label"
-      :value="props.value"
-      @input="emit('update:value', ($event.target as HTMLInputElement).value)"
+      :required="required"
+      v-model="input"
     />
   </form-label>
 </template>
 
 <script setup lang="ts">
+  import { ref, watch } from "vue";
   import FormLabel from "./form-label.vue";
 
   interface Props {
@@ -29,10 +30,16 @@
 
   const props = defineProps<Props>();
 
+  const input = ref<string>("");
+
   interface Emit {
     (e: "update:value", value: any): void;
   }
   const emit = defineEmits<Emit>();
+
+  watch(input, (state) => {
+    emit("update:value", +new Date(state));
+  });
 </script>
 
 <style lang="scss" scoped>

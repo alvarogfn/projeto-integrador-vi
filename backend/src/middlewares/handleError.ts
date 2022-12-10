@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { AuthenticationError } from "../errors/Error";
 
 export function handleError(
   err: any,
@@ -6,5 +7,8 @@ export function handleError(
   res: Response,
   next: NextFunction
 ) {
-  res.status(500).send(err);
+  if (err instanceof AuthenticationError) {
+    return res.status(401).send({ err: err.message });
+  }
+  return res.status(500).send(err);
 }

@@ -16,7 +16,7 @@ route.get("/user", userController.get);
 route.get("/clients", authenticate, clientController.getAll);
 route.get("/clients/:id", authenticate, clientController.get);
 route.post("/clients", authenticate, clientController.post);
-route.post("/clients/delete", authenticate, clientController.removeMany);
+route.delete("/clients/deleteMany", authenticate, clientController.removeMany);
 route.delete("/clients/:id", authenticate, clientController.remove);
 
 export default route;

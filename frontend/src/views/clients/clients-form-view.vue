@@ -3,7 +3,7 @@
     <h1 class="clients-form__title">
       Cadastre Novos Clientes Na sua base de dados
     </h1>
-    <form class="clients-form__form">
+    <form class="clients-form__form" @submit.prevent="submit">
       <p class="clients-form__tip">Campos com * são obrigatórios</p>
       <form-group title="Dados Pessoais">
         <form-input-text
@@ -20,6 +20,8 @@
             { id: 'M', label: 'masculino' },
             { id: 'F', label: 'feminino' },
           ]"
+          required
+          v-model:value="data.personal.gender"
           class="clients-form__input clients-form__input--sex"
         />
         <form-input-date
@@ -62,7 +64,6 @@
           ]"
         />
       </form-group>
-
       <button type="submit" class="clients-form__button">Adicionar</button>
     </form>
   </div>
@@ -76,12 +77,15 @@
   import FormInputRadio from "@/components/shared/form/form-input-radio.vue";
   import FormGroup from "@/components/shared/form/form-group.vue";
   import { reactive } from "vue";
+  import { api } from "@/api/api";
+  import { useAppStore } from "@/stores/app";
 
   const data = reactive({
     personal: {
       name: "",
       city: "",
       birthdate: "",
+      gender: "",
     },
     finance: {
       creditPreferences: [] as string[],
@@ -89,7 +93,27 @@
     },
   });
 
-  async function submit() {}
+  async function submit(event: Event) {
+    try {
+      const response = await api.post(
+        "/clients",
+        {
+          city: data.personal.city,
+          birthdate: data.personal.birthdate,
+          preferences: data.finance.creditPreferences,
+          credit: data.finance.creditAmount,
+          sex: data.personal.gender,
+        },
+        { headers: { authorization: useAppStore().token } }
+      );
+
+      (event.target as HTMLFormElement).reset();
+
+      console.log(response);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 </script>
 
 <style lang="scss" scoped>

@@ -8,6 +8,7 @@
         <button
           class="dataset__button dataset__button--delete"
           :disabled="selected.length <= 0"
+          @click="removeData"
         >
           Deletar
         </button>
@@ -18,7 +19,7 @@
           Exportar
         </button>
       </header>
-      <table class="table" v-if="hasData">
+      <table class="table">
         <thead class="table__head">
           <tr>
             <td>
@@ -35,6 +36,8 @@
             <td>Crédito</td>
             <td>Data De Nascimento</td>
             <td>Adicionado em</td>
+            <td>Modalidades</td>
+            <td>Sexo</td>
           </tr>
         </thead>
         <tbody class="table__body">
@@ -53,10 +56,12 @@
             <td>{{ formatMoney(row.credit) }}</td>
             <td>{{ formatDate(row.birthdate) }}</td>
             <td>{{ formatDate(row.createdAt) }}</td>
+            <td>{{ row.credit_preferences.join("; ") }}</td>
+            <td>{{ row.sex }}</td>
           </tr>
         </tbody>
       </table>
-      <h1 class="dataset__empty" v-else>
+      <h1 class="dataset__empty">
         Não existem dados a serem mostrados, que tal adicionar alguns?
       </h1>
     </section>
@@ -64,7 +69,10 @@
 </template>
 
 <script setup lang="ts">
+  import { api } from "@/api/api";
+  import { useFetch } from "@/composables/useFetch";
   import type { ClientModel } from "@/model/ClientModel";
+  import { useAppStore } from "@/stores/app";
   import formatDate from "@/utils/formatDate";
   import formatMoney from "@/utils/formatMoney";
   import { ref, watch, onMounted, computed } from "vue";
@@ -72,46 +80,54 @@
   const selectAll = ref<boolean>(false);
   const selected = ref<string[]>([]);
 
-  const dataset = ref<ClientModel[]>([]);
-
   watch(selected, (newState) => {
-    if (newState.length === dataset.value.length && selectAll.value !== true)
-      selectAll.value = true;
+    if (dataset.value === null) return;
 
-    if (newState.length !== dataset.value.length && selectAll.value === true)
+    if (dataset.value.length === 0) {
       selectAll.value = false;
+      return;
+    }
+    if (newState.length === dataset.value.length && selectAll.value !== true) {
+      selectAll.value = true;
+      return;
+    }
+    if (newState.length !== dataset.value.length && selectAll.value === true) {
+      selectAll.value = false;
+      return;
+    }
   });
-
-  const hasData = computed(() => dataset.value.length > 0);
 
   function selectAllChange(event: Event) {
     const checkbox = event.target as HTMLInputElement;
 
+    if (dataset.value === null) return;
+
     if (checkbox.checked) {
       selected.value = dataset.value.map((dataset) => dataset.id);
     }
-
     if (!checkbox.checked) {
       selected.value = [];
     }
   }
 
-  onMounted(async () => {
-    // dataset.value.push({
-    //   id: "123214234",
-    //   city: "Buritis",
-    //   birthdate: Date.now() - 400,
-    //   credit: 9000,
-    //   createdAt: Date.now() - 4000,
-    // });
-    // dataset.value.push({
-    //   id: "123214238",
-    //   city: "Buritis",
-    //   birthdate: Date.now() - 30,
-    //   credit: 9000,
-    //   createdAt: Date.now() - 590,
-    // });
+  const {
+    data: dataset,
+    loading,
+    error,
+    refetch,
+  } = useFetch<ClientModel[]>({
+    url: "/clients",
   });
+
+  async function removeData() {
+    const { data } = useFetch<{}>({
+      url: "/clients/deleteMany",
+      method: "delete",
+      data: { ids: selected.value },
+    });
+
+    refetch();
+  }
 </script>
 
 <style lang="scss" scoped>

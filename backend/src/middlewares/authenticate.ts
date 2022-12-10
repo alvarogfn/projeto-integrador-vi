@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import config from "../config";
+import { AuthenticationError } from "../errors/Error";
 
 export function authenticate(
   req: Request,
@@ -10,10 +11,10 @@ export function authenticate(
   try {
     const token = req.headers.authorization as string;
 
-    if (token === undefined) throw new Error("Missing Token");
+    if (token === undefined) throw new AuthenticationError("Missing Token");
 
     jwt.verify(token, config.secret, (err, decoded) => {
-      if (err) throw new Error("Invalid token");
+      if (err) return next(new AuthenticationError("Invalid token"));
 
       const { id } = decoded as unknown as { id: string };
       res.locals.USER_ID = id;

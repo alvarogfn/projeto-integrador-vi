@@ -11,6 +11,7 @@
       :id="props.id"
       :placeholder="props.placeholder ?? props.label"
       :value="props.value"
+      :required="required"
       @input="emit('update:value', ($event.target as HTMLInputElement).value)"
     />
   </form-label>
