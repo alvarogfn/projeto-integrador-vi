@@ -1,8 +1,12 @@
 <template>
   <header class="header">
     <section class="header__logo">
+      <img
+        src="http://www.atenas.edu.br/uniatenas/assets/images/@principal/tocha.png"
+        alt="UniAtenas"
+      />
       <h1>
-        <router-link :to="{ name: 'app' }"> Analise Financeira </router-link>
+        <router-link :to="{ name: 'home' }"> Analise Financeira </router-link>
       </h1>
       <p>Projeto Integrador VI</p>
     </section>
@@ -35,6 +39,20 @@
     border-right: 2px solid rgba($color: #000000, $alpha: 0.1);
 
     &__logo {
+      display: grid;
+      grid-template-areas:
+        "a b"
+        "a c";
+
+      grid-template-columns: 40px 1fr;
+      gap: 10px;
+
+      img {
+        grid-area: a;
+        width: 100%;
+        height: 100%;
+      }
+
       padding: 10px;
       margin: 10px 0 50px;
 

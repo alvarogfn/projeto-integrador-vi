@@ -1,12 +1,17 @@
 import mongoose from "mongoose";
 
 export interface UserInterface {
-  login: string;
+  username: string;
   password: string;
+  name: string;
 }
 
 const UserSchema = new mongoose.Schema<UserInterface>({
-  login: {
+  username: {
+    type: String,
+    required: true,
+  },
+  name: {
     type: String,
     required: true,
   },

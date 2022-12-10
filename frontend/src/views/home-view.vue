@@ -5,7 +5,7 @@
         <nav>
           <ul>
             <li v-for="(menu, index) in state.menu" :key="index">
-              <router-link :to="{ name: 'app' }">
+              <router-link :to="{ name: 'home' }">
                 <h1>{{ menu.title }}</h1>
                 <p>{{ menu.content }}</p>
               </router-link>

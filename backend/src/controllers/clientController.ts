@@ -6,27 +6,44 @@ export function get(
   res: Response,
   next: NextFunction
 ) {
+  console.log(res.locals.USER_ID);
   (async () => {
     const clients = await ClientModel.findById(req.params.id);
     return res.status(200).send(clients);
   })();
 }
 
-export function getAll(req: Request, res: Response, next: NextFunction) {
+export function getAll(
+  req: Request,
+  res: Response<{}, { USER_ID: string }>,
+  next: NextFunction
+) {
   (async () => {
-    const clients = await ClientModel.find();
+    const userId = res.locals.USER_ID;
+    const clients = await ClientModel.find({ createdBy: userId });
     return res.status(200).send(clients);
   })();
 }
 
 export function post(
-  req: Request<{}, {}, { birthdate: number; city: string; credit: number }>,
-  res: Response,
+  req: Request<
+    {},
+    {},
+    { birthdate: number; city: string; credit: number; preferences: number[] }
+  >,
+  res: Response<{}, { USER_ID: string }>,
   next: NextFunction
 ) {
   (async () => {
-    const data = req.body;
-    const newClient = new ClientModel(data);
+    const userId = res.locals.USER_ID;
+    const { birthdate, city, credit, preferences } = req.body;
+    const newClient = new ClientModel({
+      createdBy: userId,
+      birthdate,
+      city,
+      credit,
+      preferences,
+    });
     const response = await newClient.save();
     return res.status(200).send(response);
   })();
@@ -46,11 +63,7 @@ export function removeMany(
   })();
 }
 
-export function remove(
-  req: Request<{ id: string }>,
-  res: Response,
-  next: NextFunction
-) {
+export function remove(req: Request, res: Response, next: NextFunction) {
   (async () => {
     const id = req.params.id;
 

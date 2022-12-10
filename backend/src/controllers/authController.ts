@@ -1,30 +1,81 @@
 import { NextFunction, Request, Response } from "express";
 import Jwt from "jsonwebtoken";
+import config from "../config";
 import { UserModel } from "../models/User";
+
 export function login(
-  req: Request<{}, {}, { user: string; password: string }>,
+  req: Request<{}, {}, { username: string; password: string } | undefined>,
   res: Response,
   next: NextFunction
 ) {
   (async () => {
-    const user = await UserModel.find({
-      $where: () =>
-        this.username === req.body.user && this.password === req.body.password,
-    });
+    try {
+      if (req.body === undefined) throw new Error("Missing body");
 
-    console.log(user);
+      const { username, password } = req.body;
 
-    // if (req.body.user === "luiz" && req.body.password === "123") {
-    //   // auth ok
-    //   const id = 1; // esse id viria do banco de dados
-    //   const token = Jwt.sign({ id }, process.env.SECRET, {
-    //     expiresIn: 300, // expires in 5min
-    //   });
-    //   return res.json({ auth: true, token });
-    // }
+      if (!username || !password) throw new Error("Missing parameters");
+      const user = await UserModel.findOne({
+        username: username.toLowerCase(),
+        password,
+      });
 
-    // res.status(500).json({ message: "Login inválido!" });
+      if (user === null) throw new Error("User no found");
+
+      const id = user._id;
+      const token = Jwt.sign({ id }, config.secret, {
+        expiresIn: 50000,
+      });
+      return res.json({ name: user.name, username: user.username, token });
+    } catch (err) {
+      next(err);
+    }
   })();
 }
 
-export default { login };
+export function register(
+  req: Request<
+    {},
+    {},
+    { name: string; username: string; password: string } | undefined
+  >,
+  res: Response,
+  next: NextFunction
+) {
+  (async () => {
+    try {
+      if (req.body === undefined) throw new Error("Missing body");
+
+      const { name, username, password } = req.body;
+
+      if (!name || !username || !password)
+        throw new Error("Missing parameters");
+
+      const alreadyExists = await UserModel.findOne({
+        username: username.toLowerCase(),
+        password,
+      });
+
+      if (alreadyExists !== null) throw new Error("Already Exists");
+
+      const user = await new UserModel({
+        name,
+        username: username.toLowerCase(),
+        password,
+      }).save();
+
+      if (user === null) throw new Error("User no found");
+
+      const id = user._id;
+      const token = Jwt.sign({ id }, config.secret, {
+        expiresIn: 50000,
+      });
+
+      return res.json({ auth: true, token });
+    } catch (err) {
+      return next(err);
+    }
+  })();
+}
+
+export default { login, register };

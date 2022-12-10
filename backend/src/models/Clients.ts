@@ -1,11 +1,13 @@
-import mongoose from "mongoose";
+import mongoose, { ObjectId, Schema } from "mongoose";
 import moment from "moment";
 
 export interface ClientInterface {
-  birthdate: number;
   city: string;
+  birthdate: number;
   credit: number;
   createdAt: number;
+  createdBy: ObjectId;
+  preferences: number[];
 }
 
 const ClientSchema = new mongoose.Schema<ClientInterface>({
@@ -25,6 +27,14 @@ const ClientSchema = new mongoose.Schema<ClientInterface>({
     type: Number,
     required: true,
     default: Date.now(),
+  },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
+  preferences: {
+    type: [Number],
+    default: [],
   },
 });
 
