@@ -48,8 +48,14 @@
 
       color: rgba($color: #000000, $alpha: 0.9);
 
+      transition: 200ms;
+
       &::placeholder {
         color: rgba($color: #000000, $alpha: 0.3);
+      }
+
+      &:focus {
+        border: 1px solid rgba($color: #000000, $alpha: 0.4);
       }
     }
   }

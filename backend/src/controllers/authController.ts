@@ -71,7 +71,7 @@ export function register(
         expiresIn: 50000,
       });
 
-      return res.json({ auth: true, token });
+      return res.json({ token });
     } catch (err) {
       return next(err);
     }

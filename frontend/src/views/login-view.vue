@@ -3,7 +3,7 @@
     <main class="login__content">
       <form class="login__form" @submit.prevent="authenticate">
         <h1 class="login__title">Entrar</h1>
-        <label class="login__label" for="login">Autenticação</label>
+        <label class="login__label" for="username">Username</label>
         <input
           class="login__input"
           id="username"
@@ -12,7 +12,7 @@
           v-model="login.username"
           required
         />
-        <label class="login__label" for="login">Autenticação</label>
+        <label class="login__label" for="password">Password</label>
         <input
           class="login__input login__input--password"
           id="password"
