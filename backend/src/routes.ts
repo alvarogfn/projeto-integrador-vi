@@ -20,4 +20,5 @@ route.post("/clients", authenticate, clientController.post);
 route.delete("/clients/deleteMany", authenticate, clientController.removeMany);
 route.delete("/clients/:id", authenticate, clientController.remove);
 
+route.get("/analytics", authenticate, analyticsController.get);
 export default route;

@@ -1,8 +1,0 @@
-# syntax=docker/dockerfile:1
-version: "3.7"
-services:
-  db:
-    image: mongo
-    restart: always
-    ports:
-      - 27017:27017
