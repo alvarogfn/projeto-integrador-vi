@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientModel } from "../models/Clients";
+import { generate } from "csv-generate";
+import { stringify } from "csv-stringify";
 
 export function get(
   req: Request<{ id: string }, {}, {}>,
   res: Response,
   next: NextFunction
 ) {
-  console.log(res.locals.USER_ID);
   (async () => {
     const clients = await ClientModel.findById(req.params.id);
     return res.status(200).send(clients);
@@ -80,4 +81,23 @@ export function remove(req: Request, res: Response, next: NextFunction) {
   })();
 }
 
-export default { get, getAll, post, removeMany, remove };
+export function getCSV(req: Request, res: Response, next: NextFunction) {
+  (async () => {
+    const clients = await ClientModel.findById(req.params.id);
+
+    return res.status(200).send(
+      generate({
+        length: 20,
+      }).pipe(
+        stringify({
+          columns: {
+            year: "birthYear",
+            phone: "phone",
+          },
+        })
+      )
+    );
+  })();
+}
+
+export default { get, getAll, post, removeMany, remove, getCSV };

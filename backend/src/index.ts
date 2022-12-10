@@ -1,12 +1,10 @@
 import express from "express";
-import { config } from "dotenv";
+import config from "./config";
 import route from "./routes";
 import morgan from "morgan";
 import moongose from "mongoose";
 import cors from "cors";
 import { handleError } from "./middlewares/handleError";
-
-config({ override: true });
 
 const app = express();
 
@@ -20,8 +18,8 @@ app.use(route);
 
 app.use(handleError);
 
-const hostname = process.env.HOSTNAME ?? "localhost";
-const port = parseInt(process.env.PORT ?? "3000");
+const hostname = config.host ?? "localhost";
+const port = parseInt(config.port ?? "3000");
 
 moongose.connect("mongodb://localhost:27017/projetovi").then(
   async () => {
