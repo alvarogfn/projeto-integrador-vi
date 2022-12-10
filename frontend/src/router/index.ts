@@ -47,6 +47,7 @@ const router = createRouter({
         }
       },
     },
+    { path: "/register", name: "register", component: RegisterView },
     {
       path: "",
       component: AppView,
@@ -81,7 +82,6 @@ const router = createRouter({
         },
       ],
     },
-    { path: "/register", name: "register", component: RegisterView },
   ],
 });
 

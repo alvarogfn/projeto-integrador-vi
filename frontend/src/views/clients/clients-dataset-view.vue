@@ -80,6 +80,8 @@
   const selectAll = ref<boolean>(false);
   const selected = ref<string[]>([]);
 
+  const openDeleteModal = ref(false);
+
   watch(selected, (newState) => {
     if (dataset.value === null) return;
 

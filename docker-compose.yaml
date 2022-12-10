@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+  db:
+    image: mongo
+    container_name: projeto-vi-db
+    restart: always
+    ports:
+      - "27017"
+  backend:
+    build: "./backend"
+    container_name: projeto-vi-backend
+    restart: always
+    ports:
+      - "3000"
+    depends_on:
+      - db
+  frontend:
+    build: "./front-end"
+    container_name: projeto-vi-frontend
+    restart: "always"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend

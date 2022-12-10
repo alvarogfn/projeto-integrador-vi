@@ -1,11 +1,11 @@
 <template>
-  <div class="analytics">
+  <div class="analytics" v-if="data">
     <div class="analytics__insights">
       <insight-component
-        v-for="item in 3"
-        :title="item + ''"
-        :content="item + ''"
-        :key="item"
+        v-for="(item, index) in data.insights"
+        :title="item.label"
+        :content="item.value"
+        :key="index"
       />
     </div>
     <div class="analytics__content">
@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-  import InsightComponent from "@/components/insight-component.vue";
+  import InsightComponent from "@/components/shared/utils/insight-component.vue";
   import { Bar as BarChart } from "vue-chartjs";
   import {
     Chart as ChartJS,
@@ -39,6 +39,7 @@
     LinearScale,
   } from "chart.js";
   import { ref } from "vue";
+  import { useFetch } from "@/composables/useFetch";
 
   ChartJS.register(
     Title,
@@ -53,6 +54,8 @@
     labels: ["January", "February", "March"],
     datasets: [{ data: [40, 20, 12] }],
   });
+
+  const { data } = useFetch<any>({ url: "/analytics" });
 </script>
 
 <style lang="scss" scoped>
