@@ -18,17 +18,14 @@ app.use(route);
 
 app.use(handleError);
 
-const hostname = config.host ?? "localhost";
-const port = parseInt(config.port ?? "3000");
-
 moongose
   .connect(
     `mongodb+srv://${config.db_username}:${config.db_password}@projeto-integrador-vi.khpc7ms.mongodb.net/?retryWrites=true&w=majority`
   )
   .then(
     async () => {
-      app.listen(port, hostname, () => {
-        const url = `http://${hostname}:${port}`;
+      app.listen(3000, () => {
+        const url = `http://localhost:3000`;
         console.log("Your app is running: " + url);
       });
     },
