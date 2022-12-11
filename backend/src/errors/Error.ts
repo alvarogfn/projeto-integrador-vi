@@ -23,3 +23,15 @@ export class UnprocessableEntityError extends HTTPError {
     super(message, 422);
   }
 }
+
+export class NotFoundError extends HTTPError {
+  constructor(message: string = "Cannot find this resource") {
+    super(message, 404);
+  }
+}
+
+export class ServerError extends HTTPError {
+  constructor(message: string = "There is something broken with the server") {
+    super(message, 500);
+  }
+}

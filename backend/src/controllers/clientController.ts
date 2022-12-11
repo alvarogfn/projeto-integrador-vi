@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientModel } from "../models/Clients";
-import { generate } from "csv-generate";
-import { stringify } from "csv-stringify";
+import {
+  BadRequestError,
+  NotFoundError,
+  ServerError,
+} from "../errors/Error";
 
 export function get(
   req: Request<{ id: string }, {}, {}>,
@@ -9,8 +12,22 @@ export function get(
   next: NextFunction
 ) {
   (async () => {
-    const clients = await ClientModel.findById(req.params.id);
-    return res.status(200).send(clients);
+    try {
+      const userId = res.locals.USER_ID;
+      if (userId === null) throw new ServerError();
+
+      const client = await ClientModel.findOne({
+        createdBy: userId,
+        _id: req.params.id,
+      });
+
+      console.log(client);
+
+      if (client === null) throw new NotFoundError();
+      return res.status(200).send(client);
+    } catch (e) {
+      next(e);
+    }
   })();
 }
 
@@ -20,9 +37,14 @@ export function getAll(
   next: NextFunction
 ) {
   (async () => {
-    const userId = res.locals.USER_ID;
-    const clients = await ClientModel.find({ createdBy: userId });
-    return res.status(200).send(clients);
+    try {
+      const userId = res.locals.USER_ID;
+      if (userId === null) throw new ServerError();
+      const clients = await ClientModel.where({ createdBy: userId }).find();
+      return res.status(200).send(clients);
+    } catch (e) {
+      next(e);
+    }
   })();
 }
 
@@ -42,18 +64,26 @@ export function post(
   next: NextFunction
 ) {
   (async () => {
-    const userId = res.locals.USER_ID;
-    const { birthdate, city, credit, preferences, sex } = req.body;
-    const newClient = new ClientModel({
-      createdBy: userId,
-      birthdate,
-      city,
-      credit,
-      preferences,
-      sex,
-    });
-    const response = await newClient.save();
-    return res.status(200).send(response);
+    try {
+      const userId = res.locals.USER_ID;
+      if (userId === null) throw new ServerError();
+      const { birthdate, city, credit, preferences, sex } = req.body;
+      if (!birthdate || !city || !credit || !preferences || !sex)
+        throw new BadRequestError();
+
+      const newClient = new ClientModel({
+        createdBy: userId,
+        birthdate,
+        city,
+        credit,
+        preferences,
+        sex,
+      });
+      const response = await newClient.save();
+      return res.status(201).send(response);
+    } catch (e) {
+      next(e);
+    }
   })();
 }
 
@@ -63,41 +93,47 @@ export function removeMany(
   next: NextFunction
 ) {
   (async () => {
-    const ids = req.body.ids;
+    try {
+      const ids = req.body.ids;
+      const userId = res.locals.USER_ID;
+      if (userId === null) throw new ServerError();
 
-    await Promise.all(ids.map((id) => ClientModel.findByIdAndRemove(id)));
+      await ClientModel.deleteMany(
+        { _id: { $in: ids }, createdBy: userId },
+        (err) => {
+          throw new NotFoundError(err.message);
+        }
+      );
 
-    return res.status(204);
+      return res.status(204);
+    } catch (err) {
+      next(err);
+    }
   })();
 }
 
 export function remove(req: Request, res: Response, next: NextFunction) {
   (async () => {
-    const id = req.params.id;
+    try {
+      const userId = res.locals.USER_ID;
+      if (userId === null) throw new ServerError();
+      const id = req.params.id;
 
-    await ClientModel.findByIdAndRemove(id);
+      const client = await ClientModel.findOne({
+        createdBy: userId,
+        _id: id,
+      });
 
-    return res.status(204);
+      if (client === null) throw new NotFoundError();
+
+      await client.remove();
+
+      return res.sendStatus(204);
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
   })();
 }
 
-export function getCSV(req: Request, res: Response, next: NextFunction) {
-  (async () => {
-    const clients = await ClientModel.findById(req.params.id);
-
-    return res.status(200).send(
-      generate({
-        length: 20,
-      }).pipe(
-        stringify({
-          columns: {
-            year: "birthYear",
-            phone: "phone",
-          },
-        })
-      )
-    );
-  })();
-}
-
-export default { get, getAll, post, removeMany, remove, getCSV };
+export default { get, getAll, post, removeMany, remove };
