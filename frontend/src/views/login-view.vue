@@ -1,27 +1,34 @@
 <template>
   <div class="login">
     <main class="login__content">
-      <form class="login__form" @submit.prevent="authenticate">
+      <form class="login__form" @submit.prevent="submit">
         <h1 class="login__title">Entrar</h1>
-        <label class="login__label" for="username">Username</label>
-        <input
-          class="login__input"
+        <info-card :content="error" v-if="error" />
+        <form-input
+          label="Usuário"
+          placeholder="usuário"
           id="username"
           type="text"
-          placeholder="Username"
-          v-model="login.username"
+          v-model:value="loginForm.username.value"
+          @valid="loginForm.username.isValid = $event"
           required
         />
-        <label class="login__label" for="password">Password</label>
-        <input
-          class="login__input login__input--password"
+        <form-input
+          label="Senha"
+          placeholder="Senha"
           id="password"
           type="password"
-          v-model="login.password"
-          placeholder="Senha"
+          v-model:value="loginForm.password.value"
+          @valid="loginForm.password.isValid = $event"
           required
         />
-        <button class="login__submit" type="submit">Autenticar</button>
+        <button
+          class="login__submit"
+          type="submit"
+          :disabled="!submittable || loading"
+        >
+          Entrar
+        </button>
       </form>
       <p class="login__register">
         Não possui conta?
@@ -34,38 +41,75 @@
 </template>
 
 <script setup lang="ts">
-  import { reactive, ref } from "vue";
+  import { reactive, ref, computed } from "vue";
   import { useRouter } from "vue-router";
   import { api } from "@/api/api";
-  import type { Login } from "@/model/loginModel";
   import { useAppStore } from "@/stores/app";
+  import FormInput from "@/components/shared/form/form-input.vue";
+  import InfoCard from "@/components/shared/utils/info-card.vue";
+  import { AxiosError } from "axios";
 
   const router = useRouter();
 
   const appStore = useAppStore();
 
-  const login = reactive({ username: "", password: "" });
+  const loginForm = reactive({
+    username: {
+      value: "",
+      isValid: false,
+    },
+    password: {
+      value: "",
+      isValid: false,
+    },
+  });
 
-  const error = ref(false);
+  const error = ref("");
+  const loading = ref<boolean>(false);
 
-  async function authenticate() {
+  const submittable = computed(
+    () => loginForm.username.isValid && loginForm.password.isValid
+  );
+
+  async function submit() {
+    if (!submittable.value) return;
+
+    interface Login {
+      username: string;
+      name: string;
+      token: string;
+    }
+
     try {
+      loading.value = true;
       const response = await api.post<Login>("/login", {
-        username: login.username,
-        password: login.password,
+        username: loginForm.username.value,
+        password: loginForm.password.value,
       });
 
-      const loginData = response.data;
+      appStore.username = response.data.username;
+      appStore.name = response.data.name;
+      appStore.token = response.data.token;
 
-      appStore.username = loginData.username;
-      appStore.name = loginData.name;
-      appStore.token = loginData.token;
-
-      localStorage.setItem("token", loginData.token);
+      localStorage.setItem("token", response.data.token);
 
       if (appStore.isAuth) router.push({ name: "home" });
-    } catch (e) {
-      error.value = true;
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        const response = err.response;
+        if (response) {
+          if (response.status === 401) {
+            error.value = "Combinação de usuário e senha inválidos.";
+          }
+
+          if (response.status === 400) {
+            error.value =
+              "Alguma coisa deu errado na requisição, tente novamente.";
+          }
+        }
+      }
+    } finally {
+      loading.value = false;
     }
   }
 </script>
@@ -108,7 +152,7 @@
       flex-flow: column nowrap;
       flex-grow: 1;
       justify-content: space-between;
-      row-gap: 30px;
+      row-gap: 20px;
     }
 
     &__label {

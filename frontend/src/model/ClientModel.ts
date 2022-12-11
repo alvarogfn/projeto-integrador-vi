@@ -6,4 +6,5 @@ export interface ClientModel {
   createdAt: number;
   sex: "F" | "M";
   credit_preferences: string[];
+  age: number | string;
 }

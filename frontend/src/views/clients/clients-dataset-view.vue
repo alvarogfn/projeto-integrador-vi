@@ -34,7 +34,7 @@
             <td>Identificador</td>
             <td>Cidade</td>
             <td>Crédito</td>
-            <td>Data De Nascimento</td>
+            <td>Idade</td>
             <td>Adicionado em</td>
             <td>Modalidades</td>
             <td>Sexo</td>
@@ -54,7 +54,7 @@
             <td>{{ row.id }}</td>
             <td>{{ row.city }}</td>
             <td>{{ formatMoney(row.credit) }}</td>
-            <td>{{ formatDate(row.birthdate) }}</td>
+            <td>{{ row.age }} anos</td>
             <td>{{ formatDate(row.createdAt) }}</td>
             <td>{{ row.credit_preferences.join("; ") }}</td>
             <td>{{ row.sex }}</td>

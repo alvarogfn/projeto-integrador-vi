@@ -1,31 +1,43 @@
 <template>
   <div class="register">
     <main class="register__content">
-      <form class="register__form" @submit.prevent="register">
-        <h1 class="register__title">Registre-se</h1>
-        <form-input-text
-          id="name"
+      <form class="register__form" @submit.prevent="submit">
+        <h1 class="register__title">Registro</h1>
+        <info-card :content="error" v-if="error" />
+        <form-input
           label="Nome Completo"
-          placeholder="name"
-          v-model:value="user.name"
+          placeholder="nome"
+          id="name"
+          type="text"
+          v-model:value="registerForm.name.value"
+          @valid="registerForm.name.isValid = $event"
           required
         />
-        <form-input-text
-          id="username"
+        <form-input
           label="Nome de Usuário"
-          placeholder="Username"
-          v-model:value="user.username"
+          placeholder="usuário"
+          id="username"
+          type="text"
+          v-model:value="registerForm.username.value"
+          @valid="registerForm.username.isValid = $event"
           required
         />
-        <form-input-text
-          id="password"
-          label="Senha de autenticação"
-          type="password"
-          v-model:value="user.password"
+        <form-input
+          label="Senha"
           placeholder="Senha"
+          id="password"
+          type="password"
+          v-model:value="registerForm.password.value"
+          @valid="registerForm.password.isValid = $event"
           required
         />
-        <button class="register__submit" type="submit">Autenticar</button>
+        <button
+          class="register__submit"
+          type="submit"
+          :disabled="!submittable || loading"
+        >
+          Registrar
+        </button>
       </form>
       <p class="register__login">
         Já possui conta?
@@ -38,26 +50,82 @@
 </template>
 
 <script setup lang="ts">
-  import { reactive, ref } from "vue";
+  import { reactive, ref, computed } from "vue";
   import { useRouter } from "vue-router";
   import { api } from "@/api/api";
-  import type { Login } from "@/model/loginModel";
   import { useAppStore } from "@/stores/app";
-  import FormInputText from "@/components/shared/form/form-input-text.vue";
+  import FormInput from "@/components/shared/form/form-input.vue";
+  import InfoCard from "@/components/shared/utils/info-card.vue";
+  import { AxiosError } from "axios";
 
   const router = useRouter();
 
-  const user = reactive({ name: "", username: "", password: "" });
+  const appStore = useAppStore();
 
-  const error = ref(false);
+  const registerForm = reactive({
+    name: {
+      value: "",
+      isValid: false,
+    },
+    username: {
+      value: "",
+      isValid: false,
+    },
+    password: {
+      value: "",
+      isValid: false,
+    },
+  });
 
-  async function register() {
+  const error = ref("");
+  const loading = ref<boolean>(false);
+
+  const submittable = computed(
+    () =>
+      registerForm.name.isValid &&
+      registerForm.username.isValid &&
+      registerForm.password.isValid
+  );
+
+  async function submit() {
+    if (!submittable.value) return;
+
+    interface Register {
+      token: string;
+    }
+
     try {
-      const { data } = await api.post<Login>("/register", user);
-      localStorage.setItem("token", data.token);
+      loading.value = true;
+      const response = await api.post<Register>("/register", {
+        name: registerForm.name.value,
+        username: registerForm.username.value,
+        password: registerForm.password.value,
+      });
+
+      localStorage.setItem("token", response.data.token);
+
       router.push({ name: "login" });
-    } catch (e) {
-      error.value = true;
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        const response = err.response;
+        if (response) {
+          if (response.status === 401) {
+            error.value = "Combinação de usuário e senha inválidos.";
+          }
+
+          if (response.status === 400) {
+            error.value =
+              "Alguma coisa deu errado na requisição, tente novamente.";
+          }
+
+          if (response.status === 422) {
+            error.value =
+              "Já existe alguém com esse nome de usuário. Por favor, escolha outro.";
+          }
+        }
+      }
+    } finally {
+      loading.value = false;
     }
   }
 </script>
@@ -100,7 +168,7 @@
       flex-flow: column nowrap;
       flex-grow: 1;
       justify-content: space-between;
-      row-gap: 30px;
+      row-gap: 20px;
     }
 
     &__label {
@@ -131,7 +199,7 @@
       align-self: flex-end;
     }
 
-    &__register {
+    &__login {
       font-size: 0.9rem;
     }
 

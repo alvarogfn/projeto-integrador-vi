@@ -7,8 +7,8 @@
 
 <script setup lang="ts">
   interface Props {
-    title: string;
-    content: string;
+    title: string | number;
+    content: string | number;
   }
 
   const props = defineProps<Props>();
@@ -18,8 +18,7 @@
   @use "@/styles/colors.scss" as *;
 
   div {
-    max-width: 200px;
-    width: 100%;
+    width: min-content;
     flex-grow: 1;
     @include card($color: transparent, $padding: 15px);
 

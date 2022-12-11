@@ -9,18 +9,31 @@
       />
     </div>
     <div class="analytics__content">
-      <bar-chart class="analytics__chart" :data="chartData" />
-      <div class="analytics__details">
-        <form>
-          <input type="date" />
-          <input type="date" />
-        </form>
-      </div>
-      <div class="analytics__details">
-        <form>
-          <input type="date" />
-          <input type="date" />
-        </form>
+      <line-chart
+        class="analytics__chart"
+        v-if="data.chart"
+        v-bind="data.chart[0]"
+      />
+      <div class="analytics__controls">
+        <!-- <form @submit.prevent="submitConfigs">
+          <form-group title="Configure os Dados">
+            <form-input-number
+              label="Idade Mínima"
+              v-model:value="options.range.min"
+              :min="18"
+              :max="options.range.max"
+              :step="1"
+            />
+            <form-input-number
+              label="Idade Máxima"
+              v-model:value="options.range.max"
+              :min="options.range.max"
+              :max="data.chart[0].labels[data.chart[0].labels.length - 1]"
+              :step="1"
+            />
+          </form-group>
+          <button type="submit">Configurar</button>
+        </form> -->
       </div>
     </div>
   </div>
@@ -28,34 +41,14 @@
 
 <script setup lang="ts">
   import InsightComponent from "@/components/shared/utils/insight-component.vue";
-  import { Bar as BarChart } from "vue-chartjs";
-  import {
-    Chart as ChartJS,
-    Title,
-    Tooltip,
-    Legend,
-    BarElement,
-    CategoryScale,
-    LinearScale,
-  } from "chart.js";
-  import { ref } from "vue";
+  import LineChart from "@/components/shared/charts/line-chart.vue";
+  import { reactive, ref, watch } from "vue";
   import { useFetch } from "@/composables/useFetch";
+  import FormInputNumber from "@/components/shared/form/form-input-number.vue";
 
-  ChartJS.register(
-    Title,
-    Tooltip,
-    Legend,
-    BarElement,
-    CategoryScale,
-    LinearScale
-  );
+  import FormGroup from "@/components/shared/form/form-group.vue";
 
-  const chartData = ref({
-    labels: ["January", "February", "March"],
-    datasets: [{ data: [40, 20, 12] }],
-  });
-
-  const { data } = useFetch<any>({ url: "/analytics" });
+  const { data, loading } = useFetch<any>({ url: "/analytics" });
 </script>
 
 <style lang="scss" scoped>
@@ -85,11 +78,27 @@
       @include card($color: transparent, $padding: 20px);
     }
 
-    &__details {
-      max-height: 200px;
+    &__controls {
+      display: flex;
+      height: fit-content;
       flex-basis: 30%;
       max-width: 30%;
-      @include card($color: $color-4);
+
+      @include card($color: $color-1);
+
+      form {
+        display: flex;
+        flex-flow: column nowrap;
+        width: 100%;
+        input {
+          max-width: 100px;
+        }
+
+        button {
+          align-self: flex-end;
+          @include button;
+        }
+      }
     }
   }
 </style>
