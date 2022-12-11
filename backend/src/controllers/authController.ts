@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import Jwt from "jsonwebtoken";
 import config from "../config";
+import {
+  BadRequestError,
+  ForbiddenResourceError,
+  UnprocessableEntityError,
+} from "../errors/Error";
 import { UserModel } from "../models/User";
 
 export function login(
@@ -10,21 +15,24 @@ export function login(
 ) {
   (async () => {
     try {
-      if (req.body === undefined) throw new Error("Missing body");
+      if (req.body === undefined) throw new BadRequestError("No Body");
 
       const { username, password } = req.body;
 
-      if (!username || !password) throw new Error("Missing parameters");
+      if (!username || !password) throw new BadRequestError("Malformed Body");
       const user = await UserModel.findOne({
         username: username.toLowerCase(),
         password,
       });
 
-      if (user === null) throw new Error("User no found");
+      if (user === null)
+        throw new ForbiddenResourceError(
+          "No user for this combination of username and password"
+        );
 
       const id = user._id;
       const token = Jwt.sign({ id }, config.secret, {
-        expiresIn: 50000,
+        expiresIn: 400,
       });
       return res.json({ name: user.name, username: user.username, token });
     } catch (err) {
@@ -44,19 +52,19 @@ export function register(
 ) {
   (async () => {
     try {
-      if (req.body === undefined) throw new Error("Missing body");
+      if (req.body === undefined) throw new BadRequestError("No body");
 
       const { name, username, password } = req.body;
 
-      if (!name || !username || !password)
-        throw new Error("Missing parameters");
+      if (!name || !username || !password) throw new BadRequestError("No body");
 
       const alreadyExists = await UserModel.findOne({
         username: username.toLowerCase(),
         password,
       });
 
-      if (alreadyExists !== null) throw new Error("Already Exists");
+      if (alreadyExists !== null)
+        throw new UnprocessableEntityError("Username already exists");
 
       const user = await new UserModel({
         name,
@@ -64,7 +72,7 @@ export function register(
         password,
       }).save();
 
-      if (user === null) throw new Error("User no found");
+      if (user === null) throw new ForbiddenResourceError("User no found");
 
       const id = user._id;
       const token = Jwt.sign({ id }, config.secret, {
