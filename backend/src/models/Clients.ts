@@ -9,6 +9,7 @@ export interface ClientInterface {
   createdAt: number;
   createdBy: ObjectId;
   preferences: number[];
+  age: number;
 }
 
 const ClientSchema = new mongoose.Schema<ClientInterface>({

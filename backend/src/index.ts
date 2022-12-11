@@ -21,14 +21,18 @@ app.use(handleError);
 const hostname = config.host ?? "localhost";
 const port = parseInt(config.port ?? "3000");
 
-moongose.connect("mongodb://localhost:27017/projetovi").then(
-  async () => {
-    app.listen(port, hostname, () => {
-      const url = `http://${hostname}:${port}`;
-      console.log("Your app is running: " + url);
-    });
-  },
-  (e) => {
-    console.log(e);
-  }
-);
+moongose
+  .connect(
+    `mongodb+srv://${config.db_username}:${config.db_password}@projeto-integrador-vi.khpc7ms.mongodb.net/?retryWrites=true&w=majority`
+  )
+  .then(
+    async () => {
+      app.listen(port, hostname, () => {
+        const url = `http://${hostname}:${port}`;
+        console.log("Your app is running: " + url);
+      });
+    },
+    (e) => {
+      console.log(e);
+    }
+  );
