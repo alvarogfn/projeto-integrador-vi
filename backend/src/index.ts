@@ -22,14 +22,8 @@ moongose
   .connect(
     `mongodb+srv://${config.db_username}:${config.db_password}@projeto-integrador-vi.khpc7ms.mongodb.net/?retryWrites=true&w=majority`
   )
-  .then(
-    async () => {
-      app.listen(3000, () => {
-        const url = `http://localhost:3000`;
-        console.log("Your app is running: " + url);
-      });
-    },
-    (e) => {
-      console.log(e);
-    }
+  .then(() =>
+    app.listen(config.port, () => {
+      console.log(`Your app is running at port: ${config.port}`);
+    })
   );
