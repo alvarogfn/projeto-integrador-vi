@@ -95,7 +95,7 @@ export function get(
           ).toLocaleString("pt-br", { style: "currency", currency: "BRL" }),
         },
       ],
-      charts: charts,
+      charts,
     });
   })();
 }
