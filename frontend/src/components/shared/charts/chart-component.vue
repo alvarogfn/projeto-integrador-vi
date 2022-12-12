@@ -8,7 +8,7 @@
       :chart-options="{
         ...chartOptions,
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
       }"
       :chart-id="props.chartId"
       :plugins="props.plugins"
@@ -57,7 +57,6 @@
 
   .chart {
     @include card($padding: 10px);
-    max-width: 100%;
     overflow: hidden;
 
     &__title {
@@ -65,6 +64,11 @@
       text-align: left;
       font-size: 1.1rem;
       font-weight: 700;
+    }
+
+    &__canvas {
+      max-height: 100%;
+      max-width: 100%;
     }
   }
 </style>

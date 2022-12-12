@@ -72,7 +72,7 @@
 
     &__charts {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(calc(300px + 10vw), 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(calc(300px + 5vw), 1fr));
       gap: 20px;
     }
   }
