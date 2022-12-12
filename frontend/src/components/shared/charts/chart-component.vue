@@ -54,6 +54,12 @@
   @use "@/styles/colors.scss" as *;
 
   div {
-    @include card($padding: 30px);
+    @include card($padding: 10px);
+    max-width: 100%;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>

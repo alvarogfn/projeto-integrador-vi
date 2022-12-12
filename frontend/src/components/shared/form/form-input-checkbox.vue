@@ -68,15 +68,18 @@
     }
 
     &__values {
-      display: flex;
-      flex-flow: row nowrap;
-      gap: 30px;
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      column-gap: 30px;
+      row-gap: 10px;
       overflow: hidden;
     }
 
     &__value {
       display: flex;
       flex-flow: row nowrap;
+      align-items: flex-start;
     }
 
     &__option-label {
@@ -86,7 +89,7 @@
       padding-left: 30px;
 
       font-size: 0.9rem;
-      text-align: center;
+      text-align: left;
 
       cursor: pointer;
 

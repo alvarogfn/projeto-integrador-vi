@@ -19,48 +19,50 @@
           Exportar
         </button>
       </header>
-      <table class="table">
-        <thead class="table__head">
-          <tr>
-            <td>
-              <input
-                @change="selectAllChange"
-                class="table__check"
-                type="checkbox"
-                v-model="selectAll"
-              />
-            </td>
-            <td>Index</td>
-            <td>Identificador</td>
-            <td>Cidade</td>
-            <td>Crédito</td>
-            <td>Idade</td>
-            <td>Adicionado em</td>
-            <td>Modalidades</td>
-            <td>Sexo</td>
-          </tr>
-        </thead>
-        <tbody class="table__body">
-          <tr v-for="(row, index) in dataset" :key="row.id">
-            <td>
-              <input
-                type="checkbox"
-                :id="row.id"
-                v-model="selected"
-                :value="row.id"
-              />
-            </td>
-            <td>{{ index + 1 }}</td>
-            <td>{{ row.id }}</td>
-            <td>{{ row.city }}</td>
-            <td>{{ formatMoney(row.credit) }}</td>
-            <td>{{ row.age }} anos</td>
-            <td>{{ formatDate(row.createdAt) }}</td>
-            <td>{{ row.credit_preferences.join("; ") }}</td>
-            <td>{{ row.sex }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="dataset__table">
+        <table class="table">
+          <thead class="table__head">
+            <tr>
+              <td>
+                <input
+                  @change="selectAllChange"
+                  class="table__check"
+                  type="checkbox"
+                  v-model="selectAll"
+                />
+              </td>
+              <td>Index</td>
+              <td>Identificador</td>
+              <td>Cidade</td>
+              <td>Crédito</td>
+              <td>Idade</td>
+              <td>Adicionado em</td>
+              <td>Modalidades</td>
+              <td>Sexo</td>
+            </tr>
+          </thead>
+          <tbody class="table__body">
+            <tr v-for="(row, index) in dataset" :key="row.id">
+              <td>
+                <input
+                  type="checkbox"
+                  :id="row.id"
+                  v-model="selected"
+                  :value="row.id"
+                />
+              </td>
+              <td>{{ index + 1 }}</td>
+              <td>{{ row.id }}</td>
+              <td>{{ row.city }}</td>
+              <td>{{ formatMoney(row.credit) }}</td>
+              <td>{{ row.age }} anos</td>
+              <td>{{ formatDate(row.createdAt) }}</td>
+              <td>{{ row.credit_preferences.join("; ") }}</td>
+              <td>{{ row.sex }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <h1 class="dataset__empty" v-if="dataset && dataset.length === 0">
         Não existem dados a serem mostrados, que tal adicionar alguns?
       </h1>
@@ -70,14 +72,12 @@
 </template>
 
 <script setup lang="ts">
-  import { api } from "@/api/api";
   import LoadingComponent from "@/components/shared/utils/loading-component.vue";
   import { useFetch } from "@/composables/useFetch";
   import type { ClientModel } from "@/model/ClientModel";
-  import { useAppStore } from "@/stores/app";
   import formatDate from "@/utils/formatDate";
   import formatMoney from "@/utils/formatMoney";
-  import { ref, watch, onMounted, computed } from "vue";
+  import { ref, watch } from "vue";
 
   const selectAll = ref<boolean>(false);
   const selected = ref<string[]>([]);
@@ -115,7 +115,6 @@
   const {
     data: dataset,
     loading,
-    error,
     refetch,
   } = useFetch<ClientModel[]>({
     url: "/clients",
@@ -187,6 +186,13 @@
     &__loading {
       max-width: fit-content;
       margin: 0 auto;
+    }
+
+    &__table {
+      max-width: 100%;
+      overflow: scroll;
+
+      padding-bottom: 20px;
     }
   }
 

@@ -127,8 +127,8 @@
   async function submit(event: Event) {
     try {
       loading.value = true;
-
-      const response = await api.post(
+      error.value = "";
+      await api.post(
         "/clients",
         {
           city: clientForm.personal.city.value,
@@ -184,7 +184,7 @@
     &__input {
       flex-grow: 1;
       &--name {
-        flex-basis: 100%;
+        flex-basis: 80%;
       }
       &--birthdate {
         flex-basis: 250px;
@@ -193,7 +193,7 @@
         flex-basis: 300px;
       }
       &--sex {
-        flex-basis: 150px;
+        flex-basis: 180px;
       }
       &--creditAmount {
         flex-basis: 100%;

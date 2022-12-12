@@ -22,13 +22,12 @@
           {{ option.label }}
         </label>
       </div>
-      <p class="input__invalid" v-if="true">{{ error }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, watch, type VNodeRef } from "vue";
+  import { ref, watch } from "vue";
 
   interface Props {
     label: string;
@@ -47,8 +46,6 @@
 
   const error = ref("");
   const input = ref<string>("");
-  const inputRef = ref<null | VNodeRef>(null);
-  const blur = ref<boolean>(false);
 
   watch(input, (newState) => {
     emit("update:value", newState);
@@ -66,10 +63,6 @@
     }
     error.value = "";
   }
-  watch(error, (newError) => {
-    if (!inputRef.value) return;
-    inputRef.value.setCustomValidity(newError);
-  });
 </script>
 
 <style lang="scss" scoped>
@@ -92,7 +85,7 @@
 
     &__values {
       display: flex;
-      flex-flow: row nowrap;
+      flex-flow: row wrap;
       justify-content: space-between;
 
       border: 1px solid rgba($color: #000000, $alpha: 0.1);

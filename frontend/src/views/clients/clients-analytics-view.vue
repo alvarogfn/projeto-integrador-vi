@@ -1,5 +1,11 @@
 <template>
   <div class="analytics" v-if="!loading && dataset">
+    <info-card
+      class="analytics__alert"
+      v-if="clients && clients.length < 100"
+      :content="`Sua base de dados conta apenas com ${clients.length} registros.
+    Isso é insuficiente para uma análise eficiente.`"
+    />
     <div class="analytics__insights">
       <insight-component
         class="analytics__insights-item"
@@ -11,7 +17,7 @@
     </div>
     <div class="analytics__charts">
       <chart-component
-        v-for="(chart, index) in dataset.chart"
+        v-for="(chart, index) in dataset.chart.slice(1, -1)"
         :key="index"
         v-bind="chart"
       />
@@ -21,14 +27,25 @@
 
 <script setup lang="ts">
   import ChartComponent from "@/components/shared/charts/chart-component.vue";
+  import InfoCard from "@/components/shared/utils/info-card.vue";
   import InsightComponent from "@/components/shared/utils/insight-component.vue";
   import { useFetch } from "@/composables/useFetch";
+  import type { ClientModel } from "@/model/ClientModel";
 
   const { data: dataset, loading } = useFetch<{
     insights: { value: string; label: string }[];
-    chart: { chartData: {}; chartOptions: {}; type: string }[];
+    chart: {
+      chartData: {};
+      chartOptions: {};
+      type: "line" | "bar" | "pie" | "radar";
+    }[];
   }>({
     url: "analytics",
+    method: "get",
+  });
+
+  const { data: clients } = useFetch<ClientModel[]>({
+    url: "clients",
     method: "get",
   });
 </script>
@@ -49,8 +66,9 @@
 
     &__charts {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(calc(300px + 10vw), 1fr));
       gap: 20px;
+      aspect-ratio: 1 / 1;
     }
   }
 </style>

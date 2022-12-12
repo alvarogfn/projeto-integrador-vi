@@ -14,6 +14,7 @@ export function useFetch<T>(config: AxiosRequestConfig) {
   async function refetch() {
     loading.value = true;
     try {
+      error.value = null;
       const response = await api.request<T>({
         ...config,
         headers: { authorization: store.token, ...config.headers },

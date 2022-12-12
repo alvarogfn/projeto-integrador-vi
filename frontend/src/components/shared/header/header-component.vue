@@ -82,7 +82,9 @@
 
       z-index: 2;
       background-color: #fff;
-      width: 250px;
+      width: 70vw;
+      max-width: 270px;
+      min-width: 250px;
 
       top: 0;
       bottom: 0;
