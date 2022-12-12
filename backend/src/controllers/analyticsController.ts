@@ -63,6 +63,21 @@ export function get(
       })
     );
 
+    const charts: any[] = [
+      chartModaAgeBar(clients),
+      chartCityLength(clients),
+      chartCityBar(clients),
+    ];
+
+    if (clients.length > 50) {
+      charts.push(
+        chartAverageAge(clients),
+        chartTendencyAgeLine(clients),
+        chartCityAgeAverage(clients),
+        chartCityAgeAverageRadar(clients)
+      );
+    }
+
     res.send({
       insights: [
         {
@@ -80,15 +95,7 @@ export function get(
           ).toLocaleString("pt-br", { style: "currency", currency: "BRL" }),
         },
       ],
-      chart: [
-        chartAverageAge(clients),
-        chartTendencyAgeLine(clients),
-        chartModaAgeBar(clients),
-        chartCityBar(clients),
-        chartCityLength(clients),
-        chartCityAgeAverage(clients),
-        chartCityAgeAverageRadar(clients),
-      ],
+      charts: charts,
     });
   })();
 }
@@ -299,7 +306,9 @@ function chartCityAgeAverageRadar(clients: ClientInterface[]) {
 
   const cities = Array.from(new Set(clients.map((client) => client.city)));
 
-  const radar = new Radar().withLabels([...cities]);
+  const radar = new Radar()
+    .withLabels([...cities])
+    .withTitle("Mapeamento de crédito entre cidades e faixas etárias");
 
   let color = 0;
   groupByAge.forEach((clients, key) => {
