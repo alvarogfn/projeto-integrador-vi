@@ -1,5 +1,5 @@
 <template>
-  <pie-chart-js :chart-options="chartOptions" :data="chartData" />
+  <pie-chart-js :options="chartOptions" :data="chartData" />
 </template>
 
 <script lang="ts" setup>

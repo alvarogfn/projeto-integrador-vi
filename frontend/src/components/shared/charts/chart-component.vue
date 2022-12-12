@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="chart">
+    <h1 class="chart__title">{{ props.title }}</h1>
     <component
       class="chart__canvas"
       :is="chartComponent"
@@ -25,6 +26,7 @@
   interface Props {
     type: "line" | "pie" | "bar" | "radar";
     chartData: any;
+    title: string | undefined;
     plugins?: any;
     chartId?: number;
     chartOptions?: any;
@@ -53,13 +55,16 @@
 <style lang="scss" scoped>
   @use "@/styles/colors.scss" as *;
 
-  div {
+  .chart {
     @include card($padding: 10px);
     max-width: 100%;
     overflow: hidden;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    &__title {
+      padding: 10px 0;
+      text-align: left;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
   }
 </style>

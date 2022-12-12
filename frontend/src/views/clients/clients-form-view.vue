@@ -29,11 +29,21 @@
           @valid="clientForm.personal.gender.isValid = $event"
           class="clients-form__input clients-form__input--sex"
         />
-        <form-input
+        <!-- <form-input
           class="clients-form__input clients-form__input--birthdate"
           label="data de nascimento"
           id="birthdate"
           type="date"
+          v-model:value="clientForm.personal.birthdate.value"
+          @valid="clientForm.personal.birthdate.isValid = $event"
+          required
+          placeholder="data de nascimento"
+        /> -->
+        <form-mask-input
+          class="clients-form__input clients-form__input--birthdate"
+          label="Data de nascimento"
+          id="birthdate"
+          :mask="customMasks.date"
           v-model:value="clientForm.personal.birthdate.value"
           @valid="clientForm.personal.birthdate.isValid = $event"
           required

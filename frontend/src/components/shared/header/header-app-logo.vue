@@ -23,6 +23,7 @@
     gap: 10px;
 
     padding: 10px;
+    margin-bottom: 20px;
 
     &__imagem {
       grid-area: a;

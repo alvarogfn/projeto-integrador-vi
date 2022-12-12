@@ -1,4 +1,5 @@
 import IMask, { type AnyMaskedOptions } from "imask";
+import moment from "moment";
 
 type masks = { [k: string]: AnyMaskedOptions };
 
@@ -18,7 +19,10 @@ const customMasks: masks = {
     },
   },
   date: {
-    mask: "00/00/0000",
+    mask: Date,
+    min: moment().subtract(80, "years").toDate(),
+    max: moment().subtract(18, "years").toDate(),
+    lazy: false,
   },
 };
 

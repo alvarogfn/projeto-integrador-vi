@@ -6,6 +6,11 @@
       :content="`Sua base de dados conta apenas com ${clients.length} registros.
     Isso é insuficiente para uma análise eficiente.`"
     />
+    <info-card
+      class="analytics__alert"
+      v-if="clients && clients.length < 50"
+      :content="`Adicione mais registros para ver mais gráficos.`"
+    />
     <div class="analytics__insights">
       <insight-component
         class="analytics__insights-item"
@@ -17,7 +22,7 @@
     </div>
     <div class="analytics__charts">
       <chart-component
-        v-for="(chart, index) in dataset.chart.slice(1, -1)"
+        v-for="(chart, index) in dataset.charts"
         :key="index"
         v-bind="chart"
       />
@@ -34,10 +39,11 @@
 
   const { data: dataset, loading } = useFetch<{
     insights: { value: string; label: string }[];
-    chart: {
+    charts: {
       chartData: {};
       chartOptions: {};
       type: "line" | "bar" | "pie" | "radar";
+      title: string;
     }[];
   }>({
     url: "analytics",
@@ -68,7 +74,6 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(calc(300px + 10vw), 1fr));
       gap: 20px;
-      aspect-ratio: 1 / 1;
     }
   }
 </style>
