@@ -8,7 +8,6 @@
       :class="{ 'clients-form__form--loading': loading }"
       @submit.prevent="submit"
     >
-      <info-card v-if="error" :content="error" />
       <form-group title="Dados Pessoais">
         <form-input
           class="clients-form__input clients-form__input--name"
@@ -82,6 +81,7 @@
       >
         Adicionar
       </button>
+      <info-card v-if="error" :content="error" />
     </form>
   </div>
 </template>
@@ -127,13 +127,14 @@
   async function submit(event: Event) {
     try {
       loading.value = true;
+
       const response = await api.post(
         "/clients",
         {
           city: clientForm.personal.city.value,
           birthdate: +new Date(clientForm.personal.birthdate.value),
           sex: clientForm.personal.gender.value,
-          credit: clientForm.finance.creditAmount,
+          credit: clientForm.finance.creditAmount.value,
           preferences: clientForm.finance.creditPreferences,
         },
         { headers: { authorization: useAppStore().token } }

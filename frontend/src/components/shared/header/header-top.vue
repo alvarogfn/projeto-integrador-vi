@@ -3,10 +3,7 @@
     <section></section>
     <section class="header__logo">
       <p>@{{ store.username }}</p>
-      <img
-        src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png"
-        alt=""
-      />
+      <img src="@/assets/tocha.png" alt="UniAtenas" />
       <button @click="logout">Logout</button>
     </section>
   </header>
