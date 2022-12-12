@@ -3,7 +3,7 @@
     <h1 class="dataset__title">
       Um dataset com todos os seus já dados cadastrados
     </h1>
-    <section class="dataset__content">
+    <section class="dataset__content" v-if="!loading">
       <header class="dataset__header">
         <button
           class="dataset__button dataset__button--delete"
@@ -61,15 +61,17 @@
           </tr>
         </tbody>
       </table>
-      <h1 class="dataset__empty">
+      <h1 class="dataset__empty" v-if="dataset && dataset.length === 0">
         Não existem dados a serem mostrados, que tal adicionar alguns?
       </h1>
     </section>
+    <loading-component class="dataset__loading" v-else></loading-component>
   </div>
 </template>
 
 <script setup lang="ts">
   import { api } from "@/api/api";
+  import LoadingComponent from "@/components/shared/utils/loading-component.vue";
   import { useFetch } from "@/composables/useFetch";
   import type { ClientModel } from "@/model/ClientModel";
   import { useAppStore } from "@/stores/app";
@@ -79,8 +81,6 @@
 
   const selectAll = ref<boolean>(false);
   const selected = ref<string[]>([]);
-
-  const openDeleteModal = ref(false);
 
   watch(selected, (newState) => {
     if (dataset.value === null) return;
@@ -182,6 +182,11 @@
       &--export {
         @include button($color: $color-1, $padding: 12.5px 30px);
       }
+    }
+
+    &__loading {
+      max-width: fit-content;
+      margin: 0 auto;
     }
   }
 

@@ -1,14 +1,20 @@
 <template>
   <div>
-    <h1>{{ props.title }}</h1>
-    <p>{{ props.content }}</p>
+    <ul>
+      <li v-for="(item, index) in props.insights" :key="index">
+        <h1>{{ item.title }}</h1>
+        <p>{{ item.content }}</p>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script setup lang="ts">
   interface Props {
-    title: string | number;
-    content: string | number;
+    insights: {
+      title: string | number;
+      content: string | number;
+    }[];
   }
 
   const props = defineProps<Props>();
@@ -17,8 +23,8 @@
 <style lang="scss" scoped>
   @use "@/styles/colors.scss" as *;
 
-  div {
-    width: max-content;
+  li {
+    width: min-content;
     flex-grow: 1;
     @include card($color: transparent, $padding: 15px);
 

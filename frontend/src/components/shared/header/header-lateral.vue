@@ -1,10 +1,7 @@
 <template>
   <header class="header">
     <section class="header__logo">
-      <img
-        src="http://www.atenas.edu.br/uniatenas/assets/images/@principal/tocha.png"
-        alt="UniAtenas"
-      />
+      <img src="@/assets/tocha.png" alt="UniAtenas" />
       <h1>
         <router-link :to="{ name: 'home' }"> Analise Financeira </router-link>
       </h1>
@@ -17,7 +14,7 @@
         { label: 'Revise Dados', to: 'clients-dataset' },
         { label: 'Analise Dados', to: 'clients-analytics' },
       ]"
-    ></menu-nav>
+    />
   </header>
 </template>
 

@@ -1,7 +1,8 @@
 import { api } from "@/api/api";
 import { useAppStore } from "@/stores/app";
-import type { AxiosError, AxiosRequestConfig } from "axios";
+import { Axios, AxiosError, type AxiosRequestConfig } from "axios";
 import { ref, shallowRef } from "vue";
+import { useRouter } from "vue-router";
 
 export function useFetch<T>(config: AxiosRequestConfig) {
   const store = useAppStore();
@@ -20,6 +21,12 @@ export function useFetch<T>(config: AxiosRequestConfig) {
 
       data.value = response.data;
     } catch (e) {
+      if (e instanceof AxiosError) {
+        if (e.response?.status === 401) {
+          localStorage.removeItem("token");
+          location.reload();
+        }
+      }
       error.value = e as unknown as AxiosError;
     } finally {
       loading.value = false;

@@ -1,19 +1,19 @@
 <template>
-  <line-chart-js :chart-options="chartOptions" :data="chartData" />
+  <radar-chart-js :chart-options="props.chartOptions" :data="props.chartData" />
 </template>
 
 <script lang="ts" setup>
-  import { Line as LineChartJs } from "vue-chartjs";
+  import { Radar as RadarChartJs } from "vue-chartjs";
   import {
     Chart as ChartJS,
     Title,
     Tooltip,
     Legend,
-    PointElement,
-    LineElement,
+    CategoryScale,
+    RadialLinearScale,
   } from "chart.js";
 
-  ChartJS.register(Title, Tooltip, Legend, PointElement, LineElement);
+  ChartJS.register(Title, Tooltip, Legend, CategoryScale, RadialLinearScale);
 
   interface Props {
     chartData: any;

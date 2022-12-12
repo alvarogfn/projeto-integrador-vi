@@ -1,18 +1,25 @@
 <template>
   <header class="header">
-    <section></section>
-    <section class="header__logo">
+    <section>
       <p>@{{ store.username }}</p>
       <img src="@/assets/tocha.png" alt="UniAtenas" />
-      <button @click="logout">Logout</button>
     </section>
+    <button>
+      <img class="header__menu" src="@/assets/menu.png" alt="menu" />
+    </button>
+    <button class="header__logout" @click="logout">Logout</button>
   </header>
+  <header-lateral />
 </template>
 
 <script setup lang="ts">
   import { useAppStore } from "@/stores/app";
+  import { ref } from "vue";
+  import HeaderLateral from "./header-lateral.vue";
 
   const store = useAppStore();
+
+  const isOpen = ref<boolean>(false);
 
   function logout() {
     localStorage.removeItem("token");
@@ -27,21 +34,24 @@
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
+    align-items: center;
 
     margin-left: 250px;
     height: 70px;
 
+    padding-inline: 20px;
+
     background-color: #fff;
 
-    &__logo {
-      display: grid;
-      grid-template-areas: "a b c";
+    &__menu {
+      width: 35px;
+    }
 
-      padding: 10px;
-
-      gap: 10px;
-
+    &__user {
+      display: flex;
+      flex-flow: row-reverse wrap;
       align-items: center;
+      gap: 15px;
 
       p {
         font-weight: 700;
@@ -49,13 +59,14 @@
 
       img {
         grid-area: b;
-        width: 50px;
+        width: 30px;
+        min-width: 30px;
       }
+    }
 
-      button {
-        grid-area: c;
-        @include button($padding: 10px, $color: $color-1);
-      }
+    &__logout {
+      grid-area: c;
+      @include button($padding: 10px, $color: $color-1);
     }
   }
 </style>

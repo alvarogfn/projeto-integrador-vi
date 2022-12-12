@@ -1,19 +1,19 @@
 <template>
-  <line-chart-js :chart-options="chartOptions" :data="chartData" />
+  <pie-chart-js :chart-options="chartOptions" :data="chartData" />
 </template>
 
 <script lang="ts" setup>
-  import { Line as LineChartJs } from "vue-chartjs";
+  import { Pie as PieChartJs } from "vue-chartjs";
   import {
     Chart as ChartJS,
     Title,
     Tooltip,
     Legend,
-    PointElement,
-    LineElement,
+    CategoryScale,
+    ArcElement,
   } from "chart.js";
 
-  ChartJS.register(Title, Tooltip, Legend, PointElement, LineElement);
+  ChartJS.register(Title, Tooltip, Legend, CategoryScale, ArcElement);
 
   interface Props {
     chartData: any;

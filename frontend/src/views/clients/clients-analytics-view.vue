@@ -1,104 +1,56 @@
 <template>
-  <div class="analytics" v-if="data">
+  <div class="analytics" v-if="!loading && dataset">
     <div class="analytics__insights">
       <insight-component
-        v-for="(item, index) in data.insights"
-        :title="item.label"
-        :content="item.value"
+        class="analytics__insights-item"
         :key="index"
+        v-for="(insight, index) in dataset.insights"
+        :content="insight.value"
+        :title="insight.label"
       />
     </div>
-    <div class="analytics__content">
-      <line-chart
-        class="analytics__chart"
-        v-if="data.chart"
-        v-bind="data.chart[0]"
+    <div class="analytics__charts">
+      <chart-component
+        v-for="(chart, index) in dataset.chart"
+        :key="index"
+        v-bind="chart"
       />
-      <div class="analytics__controls">
-        <!-- <form @submit.prevent="submitConfigs">
-          <form-group title="Configure os Dados">
-            <form-input-number
-              label="Idade Mínima"
-              v-model:value="options.range.min"
-              :min="18"
-              :max="options.range.max"
-              :step="1"
-            />
-            <form-input-number
-              label="Idade Máxima"
-              v-model:value="options.range.max"
-              :min="options.range.max"
-              :max="data.chart[0].labels[data.chart[0].labels.length - 1]"
-              :step="1"
-            />
-          </form-group>
-          <button type="submit">Configurar</button>
-        </form> -->
-      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+  import ChartComponent from "@/components/shared/charts/chart-component.vue";
   import InsightComponent from "@/components/shared/utils/insight-component.vue";
-  import LineChart from "@/components/shared/charts/line-chart.vue";
-  import { reactive, ref, watch } from "vue";
   import { useFetch } from "@/composables/useFetch";
-  import FormInputNumber from "@/components/shared/form/form-input-number.vue";
 
-  import FormGroup from "@/components/shared/form/form-group.vue";
-
-  const { data, loading } = useFetch<any>({ url: "/analytics" });
+  const { data: dataset, loading } = useFetch<{
+    insights: { value: string; label: string }[];
+    chart: { chartData: {}; chartOptions: {}; type: string }[];
+  }>({
+    url: "analytics",
+    method: "get",
+  });
 </script>
 
 <style lang="scss" scoped>
-  @use "@/styles/colors.scss" as *;
-
   .analytics {
-    margin: 10px;
+    margin: 15px;
+
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 10px;
 
     &__insights {
       display: flex;
-      flex-flow: row nowrap;
-      column-gap: 10px;
+      flex-flow: row wrap;
+      gap: 15px;
     }
 
-    &__content {
-      margin: 10px 0;
-
-      display: flex;
-      flex-flow: row nowrap;
-      row-gap: 10px;
-      column-gap: 10px;
-    }
-
-    &__chart {
-      flex-basis: 70%;
-      max-width: 70%;
-      @include card($color: transparent, $padding: 20px);
-    }
-
-    &__controls {
-      display: flex;
-      height: fit-content;
-      flex-basis: 30%;
-      max-width: 30%;
-
-      @include card($color: $color-1);
-
-      form {
-        display: flex;
-        flex-flow: column nowrap;
-        width: 100%;
-        input {
-          max-width: 100px;
-        }
-
-        button {
-          align-self: flex-end;
-          @include button;
-        }
-      }
+    &__charts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 20px;
     }
   }
 </style>
