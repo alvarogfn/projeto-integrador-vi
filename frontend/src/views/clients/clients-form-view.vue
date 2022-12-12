@@ -161,7 +161,7 @@
       color: gray;
 
       text-transform: uppercase;
-      font-size: 0.9rem;
+      font-size: 1rem;
       margin: 20px 0;
     }
 

@@ -63,7 +63,7 @@
 
   h1 {
     font-weight: 600;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     margin-bottom: 10px;
   }
 </style>

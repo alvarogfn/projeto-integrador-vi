@@ -83,7 +83,7 @@
 
     &__label {
       text-transform: capitalize;
-      font-size: 0.9rem;
+      font-size: 1rem;
       font-weight: 300;
     }
 
@@ -93,7 +93,7 @@
 
     &__invalid {
       margin-top: 5px;
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       color: $color-8;
       font-weight: 700;
     }

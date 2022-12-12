@@ -25,7 +25,7 @@
     flex-flow: column nowrap;
     &__text {
       color: #2d2d2d;
-      font-size: 0.9rem;
+      font-size: 1rem;
       text-transform: capitalize;
     }
     &__required {

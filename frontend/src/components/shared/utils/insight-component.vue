@@ -30,7 +30,7 @@
   h1 {
     text-align: center;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 1rem;
     margin-bottom: 10px;
     line-height: 1.5rem;
     color: $color-1;
@@ -38,6 +38,6 @@
 
   p {
     font-weight: 900;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
 </style>

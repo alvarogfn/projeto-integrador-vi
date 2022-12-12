@@ -22,11 +22,11 @@
 
     padding: 10px;
 
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   h1 {
-    font-size: 0.9em;
+    font-size: 1.1em;
     font-weight: 600;
     margin-bottom: 10px;
 
@@ -34,7 +34,7 @@
   }
 
   p {
-    font-size: 0.85em;
+    font-size: 0.95em;
     line-height: 1rem;
     text-align: justify;
 

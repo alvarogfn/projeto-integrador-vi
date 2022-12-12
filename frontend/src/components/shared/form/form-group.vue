@@ -30,7 +30,7 @@
       display: flex;
       flex-flow: row nowrap;
 
-      font-size: 0.9rem;
+      font-size: 1rem;
       font-weight: 700;
 
       color: $color-1;

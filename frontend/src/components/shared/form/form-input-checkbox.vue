@@ -57,7 +57,7 @@
 
     &__label {
       color: #2d2d2d;
-      font-size: 0.9rem;
+      font-size: 1rem;
       text-transform: capitalize;
 
       margin-bottom: 10px;
@@ -85,7 +85,7 @@
       padding: 10px;
       padding-left: 30px;
 
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       text-align: center;
 
       cursor: pointer;

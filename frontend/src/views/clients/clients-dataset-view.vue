@@ -143,7 +143,7 @@
       color: gray;
 
       text-transform: uppercase;
-      font-size: 0.9rem;
+      font-size: 1rem;
       margin: 20px 0;
     }
 
@@ -166,7 +166,7 @@
 
     &__content {
       @include card($color: transparent);
-      font-size: 0.8rem;
+      font-size: 0.9rem;
 
       input[type="checkbox"] {
         width: 20px;
