@@ -3,7 +3,11 @@
     <h1 class="clients-form__title">
       Cadastre Novos Clientes Na sua base de dados
     </h1>
-    <form class="clients-form__form" @submit.prevent="submit">
+    <form
+      class="clients-form__form"
+      :class="{ 'clients-form__form--loading': loading }"
+      @submit.prevent="submit"
+    >
       <info-card v-if="error" :content="error" />
       <form-group title="Dados Pessoais">
         <form-input
@@ -52,7 +56,8 @@
           class="clients-form__input clients-form__input--creditAmount"
           label="Quantidade de Crédito Consumida"
           id="credit"
-          v-model:value="clientForm.finance.creditAmount"
+          v-model:value="clientForm.finance.creditAmount.value"
+          @valid="clientForm.finance.creditAmount.isValid = $event"
           required
           placeholder="R$ 0,00"
           :mask="customMasks.currency"
@@ -104,7 +109,7 @@
     },
     finance: {
       creditPreferences: [] as string[],
-      creditAmount: 0,
+      creditAmount: { value: 0, isValid: false },
     },
   });
 
@@ -115,7 +120,8 @@
     () =>
       clientForm.personal.name.isValid &&
       clientForm.personal.birthdate.isValid &&
-      clientForm.personal.gender.isValid
+      clientForm.personal.gender.isValid &&
+      clientForm.finance.creditAmount.isValid
   );
 
   async function submit(event: Event) {
@@ -138,6 +144,8 @@
       if (err instanceof AxiosError) {
         error.value = err.cause?.message ?? "Alguma coisa deu errado.";
       }
+    } finally {
+      loading.value = false;
     }
   }
 </script>
@@ -163,6 +171,13 @@
       display: flex;
       flex-flow: column nowrap;
       gap: 15px;
+
+      transition: 200ms;
+
+      &--loading {
+        pointer-events: none;
+        filter: blur(2px);
+      }
     }
 
     &__input {
