@@ -9,25 +9,26 @@
         class="radio__value"
         v-for="option in props.options"
         :key="option.id"
-        :class="{ 'radio__value--selected': selected.includes(option.id) }"
+        :class="{ 'radio__value--selected': input === option.id }"
       >
         <input
           class="radio__check"
           type="radio"
           :id="option.label"
           :value="option.id"
-          v-model="selected"
+          v-model="input"
         />
         <label class="radio__option-label" :for="option.label">
           {{ option.label }}
         </label>
       </div>
+      <p class="input__invalid" v-if="true">{{ error }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from "vue";
+  import { ref, watch, type VNodeRef } from "vue";
 
   interface Props {
     label: string;
@@ -35,18 +36,39 @@
     required?: boolean;
   }
 
-  interface Emit {
-    (e: "update:value", value: (string | number)[]): void;
-  }
-
   const props = defineProps<Props>();
+
+  interface Emit {
+    (e: "update:value", value: any): void;
+    (e: "valid", value: boolean): void;
+  }
 
   const emit = defineEmits<Emit>();
 
-  const selected = ref<(number | string)[]>([]);
+  const error = ref("");
+  const input = ref<string>("");
+  const inputRef = ref<null | VNodeRef>(null);
+  const blur = ref<boolean>(false);
 
-  watch(selected, (newValue) => {
-    emit("update:value", newValue);
+  watch(input, (newState) => {
+    emit("update:value", newState);
+    validate();
+  });
+  watch(input, () => {
+    emit("valid", error.value === "");
+  });
+  function validate() {
+    const value = input.value;
+
+    if (props.required && value.length === 0) {
+      error.value = "Campo obrigatório.";
+      return;
+    }
+    error.value = "";
+  }
+  watch(error, (newError) => {
+    if (!inputRef.value) return;
+    inputRef.value.setCustomValidity(newError);
   });
 </script>
 

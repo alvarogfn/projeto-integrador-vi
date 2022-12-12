@@ -4,13 +4,14 @@
       Cadastre Novos Clientes Na sua base de dados
     </h1>
     <form class="clients-form__form" @submit.prevent="submit">
-      <p class="clients-form__tip">Campos com * são obrigatórios</p>
+      <info-card v-if="error" :content="error" />
       <form-group title="Dados Pessoais">
-        <form-input-text
+        <form-input
           class="clients-form__input clients-form__input--name"
           label="nome"
           id="name"
-          v-model:value="data.personal.name"
+          v-model:value="clientForm.personal.name.value"
+          @valid="clientForm.personal.name.isValid = $event"
           required
           placeholder="nome"
         />
@@ -21,14 +22,17 @@
             { id: 'F', label: 'feminino' },
           ]"
           required
-          v-model:value="data.personal.gender"
+          v-model:value="clientForm.personal.gender.value"
+          @valid="clientForm.personal.gender.isValid = $event"
           class="clients-form__input clients-form__input--sex"
         />
-        <form-input-date
+        <form-input
           class="clients-form__input clients-form__input--birthdate"
           label="data de nascimento"
           id="birthdate"
-          v-model:value="data.personal.birthdate"
+          type="date"
+          v-model:value="clientForm.personal.birthdate.value"
+          @valid="clientForm.personal.birthdate.isValid = $event"
           required
           placeholder="data de nascimento"
         />
@@ -36,25 +40,27 @@
           class="clients-form__input clients-form__input--city"
           label="cidade"
           id="city"
-          v-model:value="data.personal.city"
+          v-model:value="clientForm.personal.city.value"
+          @valid="clientForm.personal.city.isValid = $event"
           required
           placeholder="cidade"
-          :values="['Buritis', 'Unaí']"
+          :values="['Buritis', 'Unaí', 'Paracatu', 'Vazante', 'Guarda  Mor']"
         />
       </form-group>
       <form-group title="Interesse do Cliente">
-        <form-input-text
+        <form-mask-input
           class="clients-form__input clients-form__input--creditAmount"
           label="Quantidade de Crédito Consumida"
           id="credit"
-          v-model:value="data.finance.creditAmount"
+          v-model:value="clientForm.finance.creditAmount"
           required
           placeholder="R$ 0,00"
+          :mask="customMasks.currency"
         />
         <form-input-checkbox
           class="clients-form__input clients-form__input--checkbox"
           label="Formas de crédito"
-          v-model:value="data.finance.creditPreferences"
+          v-model:value="clientForm.finance.creditPreferences"
           required
           :options="[
             { id: 1, label: 'Crédito' },
@@ -64,28 +70,37 @@
           ]"
         />
       </form-group>
-      <button type="submit" class="clients-form__button">Adicionar</button>
+      <button
+        type="submit"
+        class="clients-form__button"
+        :disabled="!submittable"
+      >
+        Adicionar
+      </button>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-  import FormInputText from "@/components/shared/form/form-input-text.vue";
-  import FormInputDate from "@/components/shared/form/form-input-date.vue";
+  import FormInput from "@/components/shared/form/form-input.vue";
   import FormInputSelect from "@/components/shared/form/form-input-select.vue";
   import FormInputCheckbox from "@/components/shared/form/form-input-checkbox.vue";
   import FormInputRadio from "@/components/shared/form/form-input-radio.vue";
   import FormGroup from "@/components/shared/form/form-group.vue";
-  import { reactive } from "vue";
+  import { reactive, computed, ref } from "vue";
   import { api } from "@/api/api";
   import { useAppStore } from "@/stores/app";
+  import FormMaskInput from "@/components/shared/form/form-mask-input.vue";
+  import customMasks from "@/utils/CustomMasks";
+  import { AxiosError } from "axios";
+  import InfoCard from "@/components/shared/utils/info-card.vue";
 
-  const data = reactive({
+  const clientForm = reactive({
     personal: {
-      name: "",
-      city: "",
-      birthdate: "",
-      gender: "",
+      name: { value: "", isValid: false },
+      city: { value: "", isValid: false },
+      birthdate: { value: "", isValid: false },
+      gender: { value: "", isValid: false },
     },
     finance: {
       creditPreferences: [] as string[],
@@ -93,25 +108,36 @@
     },
   });
 
+  const error = ref<string>("");
+  const loading = ref<boolean>(false);
+
+  const submittable = computed(
+    () =>
+      clientForm.personal.name.isValid &&
+      clientForm.personal.birthdate.isValid &&
+      clientForm.personal.gender.isValid
+  );
+
   async function submit(event: Event) {
     try {
+      loading.value = true;
       const response = await api.post(
         "/clients",
         {
-          city: data.personal.city,
-          birthdate: data.personal.birthdate,
-          preferences: data.finance.creditPreferences,
-          credit: data.finance.creditAmount,
-          sex: data.personal.gender,
+          city: clientForm.personal.city.value,
+          birthdate: +new Date(clientForm.personal.birthdate.value),
+          sex: clientForm.personal.gender.value,
+          credit: clientForm.finance.creditAmount,
+          preferences: clientForm.finance.creditPreferences,
         },
         { headers: { authorization: useAppStore().token } }
       );
 
       (event.target as HTMLFormElement).reset();
-
-      console.log(response);
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        error.value = err.cause?.message ?? "Alguma coisa deu errado.";
+      }
     }
   }
 </script>
@@ -128,11 +154,6 @@
       text-transform: uppercase;
       font-size: 0.9rem;
       margin: 20px 0;
-    }
-
-    &__tip {
-      font-size: 0.7rem;
-      color: $color-8;
     }
 
     &__form {
