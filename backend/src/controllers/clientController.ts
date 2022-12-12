@@ -1,10 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientModel } from "../models/Clients";
-import {
-  BadRequestError,
-  NotFoundError,
-  ServerError,
-} from "../errors/Error";
+import { BadRequestError, NotFoundError, ServerError } from "../errors/Error";
 
 export function get(
   req: Request<{ id: string }, {}, {}>,
@@ -97,15 +93,12 @@ export function removeMany(
       const ids = req.body.ids;
       const userId = res.locals.USER_ID;
       if (userId === null) throw new ServerError();
+      if (ids === null) throw new BadRequestError();
+      if (ids.length === 0) throw new BadRequestError("Empty ID Array");
 
-      await ClientModel.deleteMany(
-        { _id: { $in: ids }, createdBy: userId },
-        (err) => {
-          throw new NotFoundError(err.message);
-        }
-      );
+      await ClientModel.deleteMany({ _id: { $in: ids }, createdBy: userId });
 
-      return res.status(204);
+      return res.sendStatus(204);
     } catch (err) {
       next(err);
     }
@@ -116,6 +109,7 @@ export function remove(req: Request, res: Response, next: NextFunction) {
   (async () => {
     try {
       const userId = res.locals.USER_ID;
+
       if (userId === null) throw new ServerError();
       const id = req.params.id;
 

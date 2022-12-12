@@ -3,7 +3,12 @@ import { ClientInterface, ClientModel } from "../models/Clients";
 import { Preferences } from "../models/Preferences";
 import { Bar, Line, Pie, Radar } from "../utils/Chart";
 import { Statistics } from "../utils/Statistics";
-import { colors, groupByRange, groupObjArrayByProperty, sortObjArrayByValue } from "../utils/Utils";
+import {
+  colors,
+  groupByRange,
+  groupObjArrayByProperty,
+  sortObjArrayByValue,
+} from "../utils/Utils";
 
 export function get(
   req: Request,

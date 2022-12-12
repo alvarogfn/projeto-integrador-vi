@@ -32,7 +32,7 @@ export function login(
 
       const id = user._id;
       const token = Jwt.sign({ id }, config.secret, {
-        expiresIn: 400,
+        expiresIn: "2h",
       });
       return res.json({ name: user.name, username: user.username, token });
     } catch (err) {
