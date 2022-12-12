@@ -1,4 +1,3 @@
-import { useAppStore } from "@/stores/app";
 import axios from "axios";
 
 export const api = axios.create({
